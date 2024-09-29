@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <title>Steam Data Analysis</title>
+    <meta content="Responsive admin theme build on top of Bootstrap 4" name="description">
+
+    <link href="/static/css/bootstrap-datepicker.min.css" rel="stylesheet">
+
+    <!--Morris Chart CSS -->
+    <link rel="stylesheet" href="/static/css/morris.css">
+
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/metismenu.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+    <div class="header-bg">
+        <!-- Navigation Bar-->
+        <header id="topnav">
+            <div class="topbar-main">
+                <div class="container-fluid">
+
+                    <!-- Logo-->
+                    <div>
+                        <a href="" class="logo">
+                            <img src="/static/picture/logo-dark.png" class="logo-lg" alt="" height="22">
+                        </a>
+                    </div>
+                    <!-- End Logo-->
+
+                    <div class="menu-extras topbar-custom navbar p-0">
+
+                        <!-- Search input -->
+                        <div class="search-wrap" id="search-wrap">
+                            <div class="search-bar">
+                                <label>
+                                    <input class="search-input" type="search" placeholder="Search">
+                                </label>
+                                <a href="#" class="close-search toggle-search" data-target="#search-wrap">
+                                    <i class="mdi mdi-close-circle"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <ul class="navbar-right ml-auto list-inline float-right mb-0">
+
+                            <li class="list-inline-item dropdown notification-list d-none d-md-inline-block">
+                                <a class="nav-link waves-effect toggle-search" href="#" data-target="#search-wrap">
+                                    <i class="fas fa-search noti-icon"></i>
+                                </a>
+                            </li>
+
+
+
+                            <!-- full screen -->
+                            <li class="dropdown notification-list list-inline-item d-none d-md-inline-block">
+                                <a class="nav-link waves-effect" href="#" id="btn-fullscreen">
+                                    <i class="fas fa-expand noti-icon"></i>
+                                </a>
+                            </li>
+
+
+                            <li class="dropdown notification-list list-inline-item">
+                                <div class="dropdown notification-list nav-pro-img">
+                                    <a class="dropdown-toggle nav-link arrow-none waves-effect nav-user" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                                        {{ username }}
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated profile-dropdown">
+                                        <!-- item-->
+
+                                        <a class="dropdown-item text-danger" href="#"><i class="mdi mdi-power text-danger"></i> Logout</a>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="menu-item dropdown notification-list list-inline-item">
+                                <!-- Mobile menu toggle-->
+                                <a class="navbar-toggle nav-link">
+                                    <div class="lines">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                </a>
+                                <!-- End mobile menu toggle-->
+                            </li>
+
+                        </ul>
+
+                    </div>
+                    <!-- end menu-extras -->
+
+                    <div class="clearfix"></div>
+
+                </div>
+                <!-- end container -->
+            </div>
+            <!-- end topbar-main -->
+
+            <!-- start content -->
+            <div class="bg-dark">
+                <div class="container-fluid">
+                    <div class="row align-items-center ">
+                        <div class="col-md-8">
+                            <div class="page-title-box">
+                                <h4 class="page-title">Games Analysis</h4>
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item active">Game Reviews</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end content -->
+
+            <!-- MENU Start -->
+            <div class="navbar-custom">
+                <div class="container-fluid">
+
+                    <div id="navigation">
+
+                        <!-- Navigation Menu-->
+                        <ul class="navigation-menu">
+
+                            <li class="has-submenu">
+                                <a href="/home"><i class="dripicons-home"></i> Home Page </a>
+                            </li>
+
+                            <li class="has-submenu">
+                                <a href="/table"><i class="dripicons-document-new"></i> Data Table </a>
+                            </li>
+
+                            <li class="has-submenu">
+                                <a href="/search"><i class="dripicons-search"></i> Game Search </a>
+                            </li>
+
+                            <li class="has-submenu">
+                                <a href="/price"><i class="dripicons-graph-bar"></i> Data Analysis </a>
+                                <ul class="submenu">
+                                    <li>
+                                        <a href="/price">Price Analysis</a>
+                                    </li>
+
+                                    <li>
+                                        <a href="/type">Type Analysis</a>
+                                    </li>
+
+                                    <li>
+                                        <a href="/review">Review Analysis</a>
+                                    </li>
+
+                                    <li>
+                                        <a href="/year">Release Year Analysis</a>
+                                    </li>
+
+                                </ul>
+                            </li>
+
+                            <li class="has-submenu">
+                                <a href="/reviews"><i class="dripicons-graph-bar"></i>Game Reviews</a>
+                            </li>
+
+                            <li class="has-submenu">
+                                <a href="#"><i class="dripicons-to-do"></i>Pages</a>
+                                <ul class="submenu megamenu">
+
+                                    <li>
+                                        <ul>
+                                            <li><a href="../moban6030/pages-pricing.html">Pricing</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                        <!-- End navigation menu -->
+                    </div>
+                    <!-- end #navigation -->
+                </div>
+                <!-- end container -->
+            </div>
+            <!-- end navbar-custom -->
+        </header>
+        <!-- End Navigation Bar-->
+
+    </div>
+    <!-- header-bg -->
+
+    <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="mt-0 header-title mb-4">Search Games</h4>
+                            <form action="/search" method="post" class="form-inline">
+                                <div class="form-group mx-sm-3 mb-2">
+                                    <input type="text" name="search-input" class="form-control" id="search-input" placeholder="Please input Keywords">
+                                    <button type="submit" style="margin-left: 25px" class="btn btn-primary mb-0">Search</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="mt-0 header-title mb-4">Results</h4>
+                            <div class="col-xl-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div><h1></h1></div>
+                                            <div><img src="" alt=""></div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <blockquote class="card-bodyquote">
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                <h5></h5>
+                                                <h5></h5>
+                                                <h5></h5>
+                                            </div>
+                                            <h5></h5>
+                                            <h5>
+
+                                            </h5>
+                                        </blockquote>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- end row -->
+        </div>
+        <!-- end container-fluid -->
+    </div>
+    <!-- end wrapper -->
+
+    <!-- Footer -->
+    <footer class="footer">
+        Copyright &copy; 2024. Steam Game Analysis. Author: Xayanium
+    </footer>
+
+    <!-- End Footer -->
+
+    <!-- jQuery  -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/jquery.slimscroll.js"></script>
+    <script src="/static/js/waves.min.js"></script>
+
+    <!-- Plugins js -->
+    <script src="/static/js/apexcharts.min.js"></script>
+    <script src="/static/js/bootstrap-datepicker.min.js"></script>
+
+    <!--Morris Chart-->
+    <script src="/static/js/morris.min.js"></script>
+    <script src="/static/js/raphael.min.js"></script>
+
+    <script src="/static/js/dashboard.init.js"></script>
+
+    <!-- App js -->
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/echarts.js"></script>
+
+    <!-- Required datatable js -->
+    <script src="/static/js/jquery.dataTables.min.js"></script>
+    <script src="/static/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Datatable init js -->
+    <script src="/static/js/datatables.init.js"></script>
+
+
+</body>
+
+</html>

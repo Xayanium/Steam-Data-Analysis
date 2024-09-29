@@ -1,0 +1,11 @@
+{
+  "mysql": {
+    "host": "localhost",
+    "port": 3306,
+    "database": "steam_data",
+    "user": "root",
+    "password": "yzy2004518",
+    "charset": "utf8mb4"
+  }
+
+}

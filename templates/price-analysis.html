@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <title>Steam Data Analysis</title>
+    <meta content="Responsive admin theme build on top of Bootstrap 4" name="description">
+
+    <link href="/static/css/bootstrap-datepicker.min.css" rel="stylesheet">
+
+    <!--Morris Chart CSS -->
+    <link rel="stylesheet" href="/static/css/morris.css">
+
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/metismenu.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+    <div class="header-bg">
+        <!-- Navigation Bar-->
+        <header id="topnav">
+            <div class="topbar-main">
+                <div class="container-fluid">
+
+                    <!-- Logo-->
+                    <div>
+                        <a href="" class="logo">
+                            <img src="/static/picture/logo-dark.png" class="logo-lg" alt="" height="22">
+                        </a>
+                    </div>
+                    <!-- End Logo-->
+
+                    <div class="menu-extras topbar-custom navbar p-0">
+
+                        <!-- Search input -->
+                        <div class="search-wrap" id="search-wrap">
+                            <div class="search-bar">
+                                <label>
+                                    <input class="search-input" type="search" placeholder="Search">
+                                </label>
+                                <a href="#" class="close-search toggle-search" data-target="#search-wrap">
+                                    <i class="mdi mdi-close-circle"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <ul class="navbar-right ml-auto list-inline float-right mb-0">
+
+                            <li class="list-inline-item dropdown notification-list d-none d-md-inline-block">
+                                <a class="nav-link waves-effect toggle-search" href="#" data-target="#search-wrap">
+                                    <i class="fas fa-search noti-icon"></i>
+                                </a>
+                            </li>
+
+
+
+                            <!-- full screen -->
+                            <li class="dropdown notification-list list-inline-item d-none d-md-inline-block">
+                                <a class="nav-link waves-effect" href="#" id="btn-fullscreen">
+                                    <i class="fas fa-expand noti-icon"></i>
+                                </a>
+                            </li>
+
+
+                            <li class="dropdown notification-list list-inline-item">
+                                <div class="dropdown notification-list nav-pro-img">
+                                    <a class="dropdown-toggle nav-link arrow-none waves-effect nav-user" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                                        {{ username }}
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated profile-dropdown">
+                                        <!-- item-->
+
+                                        <a class="dropdown-item text-danger" href="/logout"><i class="mdi mdi-power text-danger"></i> Logout</a>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="menu-item dropdown notification-list list-inline-item">
+                                <!-- Mobile menu toggle-->
+                                <a class="navbar-toggle nav-link">
+                                    <div class="lines">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                </a>
+                                <!-- End mobile menu toggle-->
+                            </li>
+
+                        </ul>
+
+                    </div>
+                    <!-- end menu-extras -->
+
+                    <div class="clearfix"></div>
+
+                </div>
+                <!-- end container -->
+            </div>
+            <!-- end topbar-main -->
+
+            <!-- start content -->
+            <div class="bg-dark">
+                <div class="container-fluid">
+                    <div class="row align-items-center ">
+                        <div class="col-md-8">
+                            <div class="page-title-box">
+                                <h4 class="page-title">Games Analysis</h4>
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item active">Price Analysis</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end content -->
+
+            <!-- MENU Start -->
+            <div class="navbar-custom">
+                <div class="container-fluid">
+
+                    <div id="navigation">
+
+                        <!-- Navigation Menu-->
+                        <ul class="navigation-menu">
+
+                            <li class="has-submenu">
+                                <a href="/home"><i class="dripicons-home"></i> Home Page </a>
+                            </li>
+
+                            <li class="has-submenu">
+                                <a href="/table"><i class="dripicons-document-new"></i> Data Table </a>
+                            </li>
+
+                            <li class="has-submenu">
+                                <a href="/search"><i class="dripicons-search"></i> Game Search </a>
+                            </li>
+
+                            <li class="has-submenu">
+                                <a href="/price"><i class="dripicons-graph-bar"></i> Data Analysis </a>
+                                <ul class="submenu">
+                                    <li>
+                                        <a href="/price">Price Analysis</a>
+                                    </li>
+
+                                    <li>
+                                        <a href="/type">Type Analysis</a>
+                                    </li>
+
+                                    <li>
+                                        <a href="/review">Review Analysis</a>
+                                    </li>
+
+                                    <li>
+                                        <a href="/year">Release Year Analysis</a>
+                                    </li>
+
+                                </ul>
+                            </li>
+
+                            <li class="has-submenu">
+                                <a href="/reviews"><i class="dripicons-graph-bar"></i> Game Reviews </a>
+                            </li>
+
+                            <li class="has-submenu">
+                                <a href="#"><i class="dripicons-to-do"></i> Pages</a>
+                                <ul class="submenu megamenu">
+
+                                    <li>
+                                        <ul>
+                                            <li><a href="../moban6030/pages-pricing.html">Pricing</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                        <!-- End navigation menu -->
+                    </div>
+                    <!-- end #navigation -->
+                </div>
+                <!-- end container -->
+            </div>
+            <!-- end navbar-custom -->
+        </header>
+        <!-- End Navigation Bar-->
+
+    </div>
+    <!-- header-bg -->
+
+    <div class="wrapper">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-xl-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="mt-0 header-title mb-4">Game Prices Count</h4>
+                            <div id="Histogram" style="width: 100%;height: 450px"></div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="mt-0 header-title mb-4">Main Prices</h4>
+                            <div id="Pie" style="height: 400px"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- end row -->
+        </div>
+        <!-- end container-fluid -->
+    </div>
+    <!-- end wrapper -->
+
+    <!-- Footer -->
+    <footer class="footer">
+        Copyright &copy; 2024. Steam Game Analysis. Author: Xayanium
+    </footer>
+
+    <!-- End Footer -->
+
+    <!-- jQuery  -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/jquery.slimscroll.js"></script>
+    <script src="/static/js/waves.min.js"></script>
+
+    <!-- Plugins js -->
+    <script src="/static/js/apexcharts.min.js"></script>
+    <script src="/static/js/bootstrap-datepicker.min.js"></script>
+
+    <!--Morris Chart-->
+    <script src="/static/js/morris.min.js"></script>
+    <script src="/static/js/raphael.min.js"></script>
+
+    <script src="/static/js/dashboard.init.js"></script>
+
+    <!-- App js -->
+    <script src="/static/js/app.js"></script>
+
+    <!-- Echarts js -->
+    <script src="/static/js/echarts.js"></script>
+
+    {#  柱状图  #}
+    <script>
+        var prices = JSON.parse('{{ prices|safe }}')
+        var keys = Object.keys(prices);
+        var values = Object.values(prices);
+
+        var chartDom = document.getElementById('Histogram');
+        var myChart = echarts.init(chartDom);
+        var option;
+        option = {
+            legend: {},  //最上方出现一个标志
+            tooltip: {  //控制鼠标悬停
+              trigger: 'axis', // 触发类型, 'item' 主要用于散点图, 饼图, 'axis' 主要  用于柱状图折线图
+             },
+              yAxis: {  //Y轴
+                type: 'category',
+                  data: keys,
+                  name: 'Price',
+                  axisLabel: {
+                    show: true,  //坐标轴线是否显示
+                    inside: false,  //坐标轴线是否朝内
+                    fontSize: 15,
+                    interval: 0,
+                  },
+                  nameTextStyle: {
+                    fontSize: 16
+                  },
+              },
+              xAxis: {  //X轴
+                  name: 'Counts',  //轴的名字
+                  nameTextStyle: {  //坐标名称的样式 颜色 内边距 字体大小
+                    col: "#000",
+                    padding: [5, 0, 0, 10],
+                    fontSize: 16
+                  },
+                  nameGap: 20,  //坐标名称和轴线的距离
+                  type: 'value',  //轴的类型
+                  axisLabel: {
+                    show: true,  //坐标标签是否显示
+                      inside: false,  //坐标标签是否朝内
+                      fontSize: 16
+                  },
+              },
+              series: [  //数据内容
+                {
+                  {#data: [120, 200, 150, 80, 70, 110, 130],#}
+                  data: values,
+                  type: 'bar',
+                    itemStyle: {
+                      color: new echarts.graphic.LinearGradient(
+                          0, 0, 0, 1,
+                          [
+                              //柱子0%的颜色
+                              {offset: 0, color: '#E27BF6'},
+                              //柱子50%的颜色
+                              {offset: 0.5, color: '#D575F2'},
+                              //柱子100%的颜色
+                              {offset: 1, color: '#D14CFB'}
+                          ]
+                      )
+                    }
+                }
+              ]
+        };
+        option && myChart.setOption(option);
+    </script>
+    {#  饼图  #}
+    <script>
+        var prices = JSON.parse('{{ prices | safe }}')  //保证按照前端传递的顺序展示
+        let datas = [];
+        Object.keys(prices).forEach((key) => {
+            datas.push({
+                name: key,
+                value: prices[key]
+            })
+        })
+
+        var chartDom = document.getElementById('Pie');
+        var myChart = echarts.init(chartDom);
+        var option;
+
+        option = {
+          title: {
+            text: 'Game Price',
+            subtext: 'price',
+            left: 'center',
+          },
+          tooltip: {
+            trigger: 'item'
+          },
+          legend: {
+            show: false //不显示图例
+          },
+          series: [
+            {
+              name: 'Game Price',
+              type: 'pie',
+              radius: '50%',
+              data: datas,
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              },
+              label: {
+                    position: 'outside',  // 标签放在扇区外部
+                    avoidLabelOverlap: true,  // 避免标签重叠
+                    fontSize: 15
+              },
+              labelLine: {
+                    length:10,  // 调整标签引导线长度
+              }
+            }
+          ]
+        };
+        option && myChart.setOption(option);
+    </script>
+
+</body>
+
+</html>
