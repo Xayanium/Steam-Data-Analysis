@@ -9,11 +9,13 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import json
+
+from app import HbaseTableConn
 from utils.query import query_mysql
 
 
 class Spider(object):
-    def __init__(self, id, spider_url):
+    def __init__(self, id, spider_url,title):
         self.spider_url = spider_url
         self.id = id
         self.driver = self.start_browser()
@@ -25,6 +27,7 @@ class Spider(object):
         self.image_links = None
         self.video_link = None
         self.params = None
+        self.title = title
 
     def start_browser(self):
         option = webdriver.ChromeOptions()
@@ -68,6 +71,18 @@ class Spider(object):
             image_link=%s, video_link=%s, review=%s, sys_requirements=%s
             where id=%s
         """, self.params, 'update')
+        data_map = {
+            b'games:id':self.id,
+            b'games:types':self.params[0],
+            b'games:description':self.params[1],
+            b'games:developer':self.params[2],
+            b'games:publisher':self.params[3],
+            b'games:image_link':self.params[4],
+            b'games:video_link':self.params[5],
+            b'games:review':self.params[6],
+            b'games:sys_requirements':self.params[7],
+        }
+        HbaseTableConn.put(self.title,data_map)
 
     def spider_detail_page(self):
         # self.start_browser()
@@ -130,9 +145,9 @@ class Spider(object):
 if __name__ == '__main__':
     st_time = time.time()
 
-    elements = query_mysql('select id, detail_link from games', [], 'select')
+    elements = query_mysql('select id, detail_link,title from games', [], 'select')
     for element in elements:
-        spider = Spider(element[0], element[1])
+        spider = Spider(element[0], element[1],element[2])
         spider.spider_detail_page()
         spider.save_to_mysql()
 

@@ -5,7 +5,9 @@ import os
 import pymysql
 import json
 from pathlib import Path
-
+import happybase
+# from pymysql import connect
+# from app import table_view
 
 def query_mysql(sql, args, method):
     project_path = Path(__file__).parent.parent.resolve()
@@ -21,16 +23,30 @@ def query_mysql(sql, args, method):
         )
         try:
             with conn.cursor() as cursor:
-                cursor.execute(sql, args)
+                cursor.execute(sql, args)#拼接
                 if method == 'select':
-                    result = cursor.fetchall()
+                    result = cursor.fetchall()#select
                     return result
                 else:
-                    conn.commit()
+                    conn.commit()#执行
         except pymysql.MySQLError as e:
             print('error: ', e)
         finally:
             conn.close()
+
+def hbase_connection():
+    project_path = Path(__file__).parent.parent.resolve()
+    with open(os.path.join(project_path, 'config.json'), 'r', encoding='utf-8') as f:
+        config = json.load(f)['hbase']
+
+        conn=happybase.Connection(host=config['host'],port=config['port'])
+        try :
+            conn.create_table(name=config['table_name'],families={config['family']:dict()})
+        except Exception as e:
+            print("table: already exists:",e)
+        finally:
+            return conn.table(name=config['table'])
+
 
 
 if __name__ == '__main__':

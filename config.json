@@ -6,6 +6,12 @@
     "user": "root",
     "password": "root",
     "charset": "utf8mb4"
+  },
+  "hbase": {
+    "host": "localhost",
+    "port": "9090",
+    "table_name": "stream_data",
+    "family": "games"
   }
 
 }

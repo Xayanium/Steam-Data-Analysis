@@ -12,6 +12,8 @@ import csv
 import os
 import json
 
+from app import HbaseTableConn
+
 
 # 初始化csv配置文件, 链接数据库
 def init():
@@ -127,6 +129,7 @@ def save_to_mysql():
     cursor = conn.cursor()
     with open('./temp1.csv', 'rt', encoding='utf-8', newline='') as file:
         reader = csv.reader(file)
+        # b = HbaseTableConn.batch()
         for row in reader:
             cursor.execute("""
                 insert into games (
@@ -135,10 +138,27 @@ def save_to_mysql():
                 ) 
                 values(%s, %s, %s, %s, %s, %s, %s, %s, %s)  
             """, [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]])
-            print('execute sql')
+
+            hbase_id= HbaseTableConn.counter_inc(b'row_counter',b'games:counter')
+            data_map = {
+                b'games:id':hbase_id,
+                b'games:title':row[0],
+                b'games:icon':row[1],
+                b'games:platform':row[2],
+                b'games:release_date':row[3],
+                b'games:review_summary':row[4],
+                b'games:discount':row[5],
+                b'games:original_price':row[6],
+                b'games:final_price':row[7],
+                b'games:detail_link':row[8],
+            }
+            HbaseTableConn.put(row[0],data_map)
+
+        print('execute sql')
         conn.commit()
         cursor.close()
         conn.close()
+        # b.send()
 
 
 def spider_search_page(target_url):

@@ -3,9 +3,10 @@
 import json
 
 from flask import Flask, render_template, request, redirect, session
-from utils.query import query_mysql
+from utils.query import query_mysql, hbase_connection
 from utils.get_data import get_table_data, get_search_data, get_analysis_data
 from itertools import islice
+
 
 app = Flask(__name__)
 app.secret_key = 'hndxwcnm'
@@ -27,7 +28,7 @@ def home():
         max_discount=get_analysis_data('max_discounts')
     )
 
-
+#
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -163,7 +164,7 @@ def reviews_view():
         username=username
     )
 
-
+#
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.clear()
@@ -171,5 +172,6 @@ def logout():
 
 
 if __name__ == '__main__':
+    HbaseTableConn = hbase_connection()
     app.run(debug=True)
 

@@ -5,3 +5,5 @@
 /utils/test.py
 /utils/counts/
 /spiders/chromedriver.exe
+/__pycache__/
+/utils/__pycache__/
