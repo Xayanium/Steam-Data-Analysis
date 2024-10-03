@@ -8,10 +8,13 @@
     "charset": "utf8mb4"
   },
   "hbase": {
-    "host": "localhost",
-    "port": "9090",
+    "host": "hbase-docker",
+    "port": 9090,
     "table_name": "stream_data",
     "family": "games"
+  },
+  "path": {
+    "chromedriver": "/home/orician/.cache/selenium/chromedriver/linux64/129.0.6668.89/chromedriver",
+    "chrome": "/home/orician/.cache/selenium/chrome/linux64/129.0.6668.89/chrome"
   }
-
 }

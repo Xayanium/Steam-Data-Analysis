@@ -10,9 +10,9 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import json
 
-from app import HbaseTableConn
-from utils.query import query_mysql
+from utils.query import query_mysql , hbase_connection
 
+HbaseTableConn = hbase_connection()
 
 class Spider(object):
     def __init__(self, id, spider_url,title):
@@ -33,7 +33,7 @@ class Spider(object):
         option = webdriver.ChromeOptions()
         option.add_experimental_option('debuggerAddress', '127.0.0.1:9222')
         option.page_load_strategy = 'none'
-        driver = webdriver.Chrome(service=Service('chromedriver.exe'), options=option)
+        driver = webdriver.Chrome(service=Service('/home/orician/.cache/selenium/chromedriver/linux64/129.0.6668.89/chromedriver'), options=option)
         driver.implicitly_wait(3)  # 设置隐式等待3秒
         driver.get(self.spider_url)
         return driver
@@ -72,7 +72,7 @@ class Spider(object):
             where id=%s
         """, self.params, 'update')
         data_map = {
-            b'games:id':self.id,
+            b'games:id':self.id.to_bytes(),
             b'games:types':self.params[0],
             b'games:description':self.params[1],
             b'games:developer':self.params[2],

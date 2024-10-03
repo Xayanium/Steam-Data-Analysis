@@ -9,6 +9,8 @@ import happybase
 # from pymysql import connect
 # from app import table_view
 
+HbaseTableConn = None
+
 def query_mysql(sql, args, method):
     project_path = Path(__file__).parent.parent.resolve()
     with open(os.path.join(project_path, 'config.json'), 'r', encoding='utf-8') as f:
@@ -39,13 +41,15 @@ def hbase_connection():
     with open(os.path.join(project_path, 'config.json'), 'r', encoding='utf-8') as f:
         config = json.load(f)['hbase']
 
-        conn=happybase.Connection(host=config['host'],port=config['port'])
-        try :
-            conn.create_table(name=config['table_name'],families={config['family']:dict()})
-        except Exception as e:
-            print("table: already exists:",e)
-        finally:
-            return conn.table(name=config['table'])
+        pool=happybase.ConnectionPool(size=10,host=config['host'],port=int(config['port']))
+        return pool
+        # try :
+        #     conn.create_table(name=config['table_name'],families={config['family']:dict()})
+        # except Exception as e:
+        #     print("table: already exists:",e)
+        # finally:
+        #     return conn.table(name=config['table_name'])
+
 
 
 

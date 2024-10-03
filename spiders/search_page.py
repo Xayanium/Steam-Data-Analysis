@@ -12,7 +12,8 @@ import csv
 import os
 import json
 
-from app import HbaseTableConn
+from utils.query import  hbase_connection
+HbaseTableConn = hbase_connection()
 
 
 # 初始化csv配置文件, 链接数据库
@@ -102,7 +103,7 @@ def init():
 def start_browser():
     option = webdriver.ChromeOptions()
     option.add_experimental_option('debuggerAddress', '127.0.0.1:9222')
-    driver = webdriver.Chrome(service=Service('chromedriver.exe'), options=option)
+    driver = webdriver.Chrome(service=Service('/home/orician/.cache/selenium/chromedriver/linux64/129.0.6668.89/chromedriver'), options=option)
     # driver.implicitly_wait(0.5)  # 设置隐式等待0.5秒
     return driver
 
@@ -120,7 +121,7 @@ def save_to_mysql():
     conn = pymysql.connect(
         host='localhost',
         user='root',
-        password='yzy2004518',
+        password='root',
         database='steam_data',
         port=3306,
         charset='utf8mb4'
@@ -141,7 +142,7 @@ def save_to_mysql():
 
             hbase_id= HbaseTableConn.counter_inc(b'row_counter',b'games:counter')
             data_map = {
-                b'games:id':hbase_id,
+                b'games:id':hbase_id.to_bytes(),
                 b'games:title':row[0],
                 b'games:icon':row[1],
                 b'games:platform':row[2],
