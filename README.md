@@ -7,10 +7,25 @@
 1. `pip install flask`
 2. `pip install pymysql`
 3. `pip install mrjob`
+4. `pip install happybase`
 
 ### 3. 修改config.json中的配置信息为自己的mysql信息
 
 ### 4. 在mysql中新建一个数据库, 并执行 `games.sql` 和 `user.sql`
+
+### 5. 修改docker-compose.yml文件，指定数据volume挂载到本地的目录，然后本地的项目根目录下执行 ` docker-compose -f .\docker-compose.yml up -d`
+
+### 6. 执行`docker exec -it steam-data-analysis-hbase-docker-1 bash`进入容器内部，执行` echo $HOSTNAME`，复制输出结果
+
+### 7. 打开Windows的"C:\Windows\System32\drivers\etc\hosts"文件，在文件末尾添加容器主机名和本地IP地址的映射，如：“127.0.0.1 xxxxx”（替换成你复制的主机名）
+
+### 8. 你需要连接hbase并且创建名为“stream_data”的表。（如果你挂载的volume中有数据，则跳过此步）
+
+### 8. 准备好Linux版本的Chrome和driver并且修改代码中的路径。然后运行Chrome启动文件。（确保Chrome和driver版本匹配）
+
+### 9. 如果启动失败，你需要根据报错下载缺少的库，如：`sudo apt-get install libnss3 libx11-6 libasound2 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxrandr2 libxdamage1 libxkbcommon0 libgbm1 libgtk-3-0`
+
+
 
 ### 5. 运行 `app.py` 文件
 
