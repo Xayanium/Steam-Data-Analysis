@@ -2,36 +2,42 @@
 # @Author: Xayanium
 import os.path
 
-from utils.query import query_mysql
+# from Cython.Utility.MemoryView import result
 import json
+# from urllib.parse import to_bytes
 
 
 # 游戏表格详情页展示数据
-def get_table_data():
+def get_table_data(hbase_table_conn):
     try:
-        result = query_mysql("""
-            select id, title, icon, platform, release_date, review_summary, final_price, 
-            types, description, video_link, developer, publisher 
-            from games
-        """, [], 'select')
+        # result = query_mysql("""
+        #     select id, title, icon, platform, release_date, review_summary, final_price,
+        #     types, description, video_link, developer, publisher
+        #     from games
+        # """, [], 'select')
+
+        result=hbase_table_conn.scan(columns=[b'games:id', b'games:title', b'games:icon', b'games:platform',
+            b'games:release_date',b'games:review_summary',b'games:final_price',b'games:types',
+            b'games:description',b'games:video_link',b'games:developer',b'games:publisher'])
+
     except Exception:
         return []
 
     game_dict = []
-    for x in result:
+    for row_key,x in result:
         game_dict.append(
             {
-                'id': x[0],
-                'name': x[1],
-                'icon': x[2],
-                'platform': list(json.loads(x[3])),
-                'release_date': x[4],
-                'review': x[5].split('\u3002')[0],  # 截取中文句号前内容
-                'price': x[6],
-                'types': list(json.loads(x[7])),
-                'description': x[8],
-                'video': x[9],
-                'firm': [x[10], x[11]]
+                'id':int.from_bytes(x.get(b'games:id', b'\x00\x00\x00\x00\x00\x00\x00\x00')) ,
+                'name': x.get(b'games:title',b'').decode('utf-8'),
+                'icon': x.get(b'games:icon',b'').decode('utf-8'),
+                'platform': list(json.loads(x.get(b'games:platform','[]'))),
+                'release_date': x.get(b'games:release_date',b'').decode('utf-8'),
+                'review': x.get(b'games:review_summary',b'').decode('utf-8').split('\u3002')[0],  # 截取中文句号前内容
+                'price': x.get(b'games:final_price',b'').decode('utf-8'),
+                'types': list(json.loads(x.get(b'games:types','[]'))),
+                'description': x.get(b'games:description',b'').decode('utf-8'),
+                'video': x.get(b'games:video_link',b'').decode('utf-8'),
+                'firm': [x.get(b'games:developer',b'').decode('utf-8'), x.get(b'games:publisher',b'').decode('utf-8')]
             }
         )
 
@@ -39,40 +45,43 @@ def get_table_data():
 
 
 # 游戏搜索详情页展示数据
-def get_search_data(title):
+def get_search_data(hbase_table_conn, title):
     try:
         if title:
-            result = query_mysql("""
-                select * from games where title like %s
-            """, ['%' + title + '%'], 'select')[0]
+            # result = query_mysql("""
+            #     select * from games where title like %s
+            # """, ['%' + title + '%'], 'select')[0]
+            results=hbase_table_conn.scan(row_prefix=title.encode('utf-8'), limit=1)
         else:
-            result = query_mysql("""
-                        select * from games where id=1
-                    """, [], 'select')[0]
+            # result = query_mysql("""
+            #             select * from games where id=1
+            #         """, [], 'select')[0]
+            results=hbase_table_conn.scan(limit=1)
     except Exception:
         return {}
 
-    game_dict = {
-        'id': result[0],
-        'name': result[1],
-        'icon': result[2],
-        'platform': json.loads(result[3]),
-        'release_date': result[4],
-        'review_summary': result[5].split('\u3002')[0],  # 截取中文句号前内容
-        'discount': result[6],
-        'original_price': result[7],
-        'final_price': result[8],
-        'detail_link': result[9],
-        'types': json.loads(result[10]),
-        'description': result[11],
-        'developer': result[12],
-        'publisher': result[13],
-        'image_link': result[14],
-        'video_link': result[15],
-        'review': json.loads(result[16]),
-        'sys_requirements': json.loads(result[17])
-    }
-    return game_dict
+    for key,result in results:
+        game_dict = {
+            'id':int.from_bytes(result.get(b'games:id', b'\x00\x00\x00\x00\x00\x00\x00\x00')) ,
+            'name': result.get(b'games:title',b'').decode('utf-8'),
+            'icon': result.get(b'games:icon',b'').decode('utf-8'),
+            'platform': list(json.loads(result.get(b'games:platform','[]'))),
+            'release_date': result.get(b'games:release_date',b'').decode('utf-8'),
+            'review_summary': result.get(b'games:review_summary',b'').decode('utf-8').split('\u3002')[0],  # 截取中文句号前内容
+            'discount': result.get(b'games:discount',b'').decode('utf-8'),  #,
+            'original_price': result.get(b'games:original_price',b'').decode('utf-8'),
+            'final_price': result.get(b'games:final_price',b'').decode('utf-8'),
+            'detail_link': result.get(b'games:detail_link',b'').decode('utf-8'),
+            'types': result.get(b'games:type',b'').decode('utf-8'),
+            'description': result.get(b'games:description',b'').decode('utf-8'),
+            'developer': result.get(b'games:developer',b'').decode('utf-8'),
+            'publisher': result.get(b'games:publisher',b'').decode('utf-8'),
+            'image_link': result.get(b'games:image_link',b'').decode('utf-8'),
+            'video_link': result.get(b'games:video_link',b'').decode('utf-8'),
+            'review': json.loads(result.get(b'games:review',b'').decode('utf-8')),
+            'sys_requirements': json.loads(result.get(b'games:sys_requirements',b'').decode('utf-8'))
+        }
+        return game_dict
 
 
 # Mapreduce后的数据获取

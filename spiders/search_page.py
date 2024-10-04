@@ -12,6 +12,9 @@ import csv
 import os
 import json
 
+from utils.query import  hbase_connection
+HbaseTableConn = hbase_connection()
+
 
 # 初始化csv配置文件, 链接数据库
 def init():
@@ -100,7 +103,7 @@ def init():
 def start_browser():
     option = webdriver.ChromeOptions()
     option.add_experimental_option('debuggerAddress', '127.0.0.1:9222')
-    driver = webdriver.Chrome(service=Service('chromedriver.exe'), options=option)
+    driver = webdriver.Chrome(service=Service('/home/orician/.cache/selenium/chromedriver/linux64/129.0.6668.89/chromedriver'), options=option)
     # driver.implicitly_wait(0.5)  # 设置隐式等待0.5秒
     return driver
 
@@ -118,7 +121,7 @@ def save_to_mysql():
     conn = pymysql.connect(
         host='localhost',
         user='root',
-        password='yzy2004518',
+        password='root',
         database='steam_data',
         port=3306,
         charset='utf8mb4'
@@ -127,6 +130,7 @@ def save_to_mysql():
     cursor = conn.cursor()
     with open('./temp1.csv', 'rt', encoding='utf-8', newline='') as file:
         reader = csv.reader(file)
+        # b = HbaseTableConn.batch()
         for row in reader:
             cursor.execute("""
                 insert into games (
@@ -135,10 +139,27 @@ def save_to_mysql():
                 ) 
                 values(%s, %s, %s, %s, %s, %s, %s, %s, %s)  
             """, [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]])
-            print('execute sql')
+
+            hbase_id= HbaseTableConn.counter_inc(b'row_counter',b'games:counter')
+            data_map = {
+                b'games:id':hbase_id.to_bytes(),
+                b'games:title':row[0],
+                b'games:icon':row[1],
+                b'games:platform':row[2],
+                b'games:release_date':row[3],
+                b'games:review_summary':row[4],
+                b'games:discount':row[5],
+                b'games:original_price':row[6],
+                b'games:final_price':row[7],
+                b'games:detail_link':row[8],
+            }
+            HbaseTableConn.put(row[0],data_map)
+
+        print('execute sql')
         conn.commit()
         cursor.close()
         conn.close()
+        # b.send()
 
 
 def spider_search_page(target_url):

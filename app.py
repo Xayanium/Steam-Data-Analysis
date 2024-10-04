@@ -3,13 +3,15 @@
 import json
 
 from flask import Flask, render_template, request, redirect, session
-from utils.query import query_mysql
+from utils.query import query_mysql,hbase_connection
 from utils.get_data import get_table_data, get_search_data, get_analysis_data
 from itertools import islice
 
+# HbaseTableConn = None
+pool= hbase_connection()
+
 app = Flask(__name__)
 app.secret_key = 'hndxwcnm'
-
 
 @app.route('/')
 def index():
@@ -27,7 +29,7 @@ def home():
         max_discount=get_analysis_data('max_discounts')
     )
 
-
+#
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -85,9 +87,11 @@ def register():
 @app.route('/table', methods=['GET', 'POST'])
 def table_view():
     username = session['username']
+    with pool.connection() as connection:
+        table_data= get_table_data(connection.table("stream_data"))
     return render_template(
         'table-data.html',
-        table_data=get_table_data(),
+        table_data=table_data,
         username=username
     )
 
@@ -97,14 +101,16 @@ def search_view():
     username = session['username']
     if request.method == 'POST':
         form = dict(request.form)
-        data = get_search_data(form['search-input'])
+        with pool.connection() as connection:
+            data = get_search_data(connection.table("stream_data"),form['search-input'])
         return render_template(
             'search-games.html',
             username=username,
             data=data
         )
     else:
-        data = get_search_data(None)
+        with pool.connection() as connection:
+            data = get_search_data(connection.table("stream_data"),None)
         return render_template(
             'search-games.html',
             username=username,
@@ -163,7 +169,7 @@ def reviews_view():
         username=username
     )
 
-
+#
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.clear()

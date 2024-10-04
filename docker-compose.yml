@@ -1,0 +1,15 @@
+services:
+  hbase-docker:
+    image: dajobe/hbase:latest
+    ports:
+      - "2181:2181"
+      - "8080:8080"
+      - "8085:8085"
+      - "9090:9090"
+      - "9095:9095"
+      - "16020:16010"
+    environment:
+      - HBASE_DOCKER_HOSTNAME=hbase-docker
+#      - HOSTNAME=hbase-docker
+    volumes:
+      - D:\dev\others\mount_data\hbase-docker:/data
