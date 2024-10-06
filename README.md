@@ -21,13 +21,11 @@
 
 ### 8. 你需要连接hbase并且创建名为“stream_data”的表。（如果你挂载的volume中有数据，则跳过此步）
 
-### 8. 准备好Linux版本的Chrome和driver并且修改代码中的路径。然后运行Chrome启动文件。（确保Chrome和driver版本匹配）
+### 9. 准备好Linux版本的Chrome和driver并且修改代码中的路径。然后运行Chrome启动文件。（确保Chrome和driver版本匹配）
 
-### 9. 如果启动失败，你需要根据报错下载缺少的库，如：`sudo apt-get install libnss3 libx11-6 libasound2 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxrandr2 libxdamage1 libxkbcommon0 libgbm1 libgtk-3-0`
+### 10. 如果启动失败，你需要根据报错下载缺少的库，如：`sudo apt-get install libnss3 libx11-6 libasound2 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxrandr2 libxdamage1 libxkbcommon0 libgbm1 libgtk-3-0`
 
-
-
-### 5. 运行 `app.py` 文件
+### 11. 运行 `app.py` 文件
 
 
 
