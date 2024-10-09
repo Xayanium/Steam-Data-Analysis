@@ -5,7 +5,7 @@ import os
 import pymysql
 import json
 from pathlib import Path
-import happybase
+# import happybase
 # from pymysql import connect
 # from app import table_view
 
@@ -36,13 +36,13 @@ def query_mysql(sql, args, method):
         finally:
             conn.close()
 
-def hbase_connection():
-    project_path = Path(__file__).parent.parent.resolve()
-    with open(os.path.join(project_path, 'config.json'), 'r', encoding='utf-8') as f:
-        config = json.load(f)['hbase']
-
-        pool=happybase.ConnectionPool(size=10,host=config['host'],port=int(config['port']))
-        return pool
+# def hbase_connection():
+#     project_path = Path(__file__).parent.parent.resolve()
+#     with open(os.path.join(project_path, 'config.json'), 'r', encoding='utf-8') as f:
+#         config = json.load(f)['hbase']
+#
+#         pool=happybase.ConnectionPool(size=10,host=config['host'],port=int(config['port']))
+#         return pool
         # try :
         #     conn.create_table(name=config['table_name'],families={config['family']:dict()})
         # except Exception as e:

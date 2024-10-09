@@ -7,11 +7,12 @@
 1. `pip install flask`
 2. `pip install pymysql`
 3. `pip install mrjob`
-4. `pip install happybase`
+4. `pip install selenium`
+5. `pip install happybase`
 
 ### 3. 修改config.json中的配置信息为自己的mysql信息
 
-### 4. 在mysql中新建一个数据库, 并执行 `games.sql` 和 `user.sql`
+### 4. 在mysql中新建名为 `steam_data` 数据库, 并运行 `init.py`
 
 ### 5. 修改docker-compose.yml文件，指定数据volume挂载到本地的目录，然后本地的项目根目录下执行 ` docker-compose -f .\docker-compose.yml up -d`
 

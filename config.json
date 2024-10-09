@@ -4,7 +4,7 @@
     "port": 3306,
     "database": "steam_data",
     "user": "root",
-    "password": "root",
+    "password": "1111",
     "charset": "utf8mb4"
   },
   "hbase": {
@@ -16,5 +16,9 @@
   "path": {
     "chromedriver": "/home/orician/.cache/selenium/chromedriver/linux64/129.0.6668.89/chromedriver",
     "chrome": "/home/orician/.cache/selenium/chrome/linux64/129.0.6668.89/chrome"
+  },
+  "spider": {
+    "driver_path": "",
+    "chrome_path": ""
   }
 }

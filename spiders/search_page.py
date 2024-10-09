@@ -11,6 +11,7 @@ from selenium.webdriver.common.by import By
 import csv
 import os
 import json
+from pathlib import Path
 
 from utils.query import  hbase_connection
 HbaseTableConn = hbase_connection()
@@ -70,8 +71,8 @@ def init():
             
             types varchar(1024),
             description text,
-            recent_review varchar(255),
-            all_review varchar(255),
+            #recent_review varchar(255),
+            #all_review varchar(255),
             developer varchar(255),
             publisher varchar(255),
             image_link text,
@@ -101,6 +102,8 @@ def init():
 
 # selenium启动浏览器
 def start_browser():
+    path = os.path.dirname(os.path.abspath(__file__))
+
     option = webdriver.ChromeOptions()
     option.add_experimental_option('debuggerAddress', '127.0.0.1:9222')
     driver = webdriver.Chrome(service=Service('/home/orician/.cache/selenium/chromedriver/linux64/129.0.6668.89/chromedriver'), options=option)
@@ -135,9 +138,9 @@ def save_to_mysql():
             cursor.execute("""
                 insert into games (
                     title, icon, platform, release_date, review_summary,
-                    discount, original_price, final_price, detail_link   
-                ) 
-                values(%s, %s, %s, %s, %s, %s, %s, %s, %s)  
+                    discount, original_price, final_price, detail_link
+                )
+                values(%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]])
 
             hbase_id= HbaseTableConn.counter_inc(b'row_counter',b'games:counter')
@@ -227,6 +230,8 @@ def spider_search_page(target_url):
 if __name__ == '__main__':
     # start_browser()
     # init()
-    target = f'https://store.steampowered.com/search/?page={1}&ndl=1'
-    spider_search_page(target)
-    save_to_mysql()
+    # target = f'https://store.steampowered.com/search/?page={1}&ndl=1'
+    # spider_search_page(target)
+    # save_to_mysql()
+    pass
+
