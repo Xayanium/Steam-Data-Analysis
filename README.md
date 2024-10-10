@@ -1,6 +1,6 @@
 **运行步骤:**
 
-### 1. 下载文件解压
+### 1. 项目 git clone 到本地 / 下载压缩文件解压
 
 ### 2. 利用pip安装第三方包
 
@@ -8,7 +8,10 @@
 2. `pip install pymysql`
 3. `pip install mrjob`
 4. `pip install selenium`
-5. `pip install happybase`
+5. `pip install happybase` 
+
+注: 由于happybase库需要gcc构建工具, 此库在windows上安装时可能会出错, 建议使用linux系统,
+以Ubuntu22.04为例, 首先保证环境中有gcc工具, 然后安装Python开发包 `sudo apt-get install python3-dev`
 
 ### 3. 修改config.json中的配置信息为自己的mysql信息
 

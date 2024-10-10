@@ -36,6 +36,7 @@ if __name__ == '__main__':
         password varchar(255)
     )
     """, [], 'create')  # 创建user表
+    print('successfully create tables games and user')
 
 
 

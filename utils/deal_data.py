@@ -12,7 +12,6 @@ from mrjob.job import MRJob
 from mrjob.step import MRStep
 import csv
 import ast
-from collections import OrderedDict
 
 
 class YearCount(MRJob):

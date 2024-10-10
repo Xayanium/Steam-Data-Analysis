@@ -1,9 +1,9 @@
 {
   "mysql": {
-    "host": "localhost",
+    "host": "127.0.0.1",
     "port": 3306,
     "database": "steam_data",
-    "user": "root",
+    "user": "xa",
     "password": "1111",
     "charset": "utf8mb4"
   },
