@@ -1,11 +1,12 @@
 /static/js/* linguist-vendored
+app.js linguist-vendored=false
+alertify-init.js linguist-vendored=false
+rwd-table.min.js linguist-vendored=false
+
 /static/css/* linguist-vendored
+dataTables.bootstrap4.min.css linguist-vendored=false
+
 /templates/* linguist-vendored
-!static/js/app.js
-!static/js/alertify-init.js
-!static/js/rwd-table.min.js
-!static/css/dataTables.bootstrap4.min.css
-!templates/index.html
-!templates/index.html
-!templates/pages-login.html
-!templates/pages-register.html
+index.html linguist-vendored=false
+pages-login.html linguist-vendored=false
+pages-register.html linguist-vendored=false
