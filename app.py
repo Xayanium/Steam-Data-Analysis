@@ -3,12 +3,14 @@
 import json
 
 from flask import Flask, render_template, request, redirect, session
-from utils.query import query_mysql,hbase_connection
+from utils.query import QueryData
 from utils.get_data import get_table_data, get_search_data, get_analysis_data
 from itertools import islice
 
 # HbaseTableConn = None
-pool= hbase_connection()
+# pool= hbase_connection()
+query = QueryData()
+
 
 app = Flask(__name__)
 app.secret_key = 'hndxwcnm'
@@ -29,12 +31,12 @@ def home():
         max_discount=get_analysis_data('max_discounts')
     )
 
-#
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         form = dict(request.form)
-        users = query_mysql('select * from user', [], 'select')
+        users = query.query_mysql('select * from user', [], 'select')
 
         def filter_user(item):
             return form['username'] in item and form['password'] in item
@@ -52,14 +54,13 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    username = session['username']
     if request.method == 'POST':
         form = dict(request.form)
         if form['username'] and form['password'] and form['confirm']:
             if form['password'] != form['confirm']:
                 return 'Passwords do not match'
             else:
-                users = query_mysql('select * from user', [], 'select')
+                users = query.query_mysql('select * from user', [], 'select')
 
                 def filter_user(item):
                     return form['username'] in item and form['password'] in item
@@ -68,7 +69,7 @@ def register():
                 if len(filter_list):
                     return 'Username already exists'
                 else:
-                    query_mysql(
+                    query.query_mysql(
                         'insert into user (username, password) values (%s, %s)',
                         (form['username'], form['password']),
                         'insert'
@@ -80,15 +81,16 @@ def register():
     else:
         return render_template(
             'pages-register.html',
-            username=username
         )
 
 
 @app.route('/table', methods=['GET', 'POST'])
 def table_view():
     username = session['username']
-    with pool.connection() as connection:
-        table_data= get_table_data(connection.table("stream_data"))
+    # with pool.connection() as connection:
+    #     table_data= get_table_data(connection.table("steam_data"))
+    table_data = get_table_data(query)
+
     return render_template(
         'table-data.html',
         table_data=table_data,
@@ -101,16 +103,18 @@ def search_view():
     username = session['username']
     if request.method == 'POST':
         form = dict(request.form)
-        with pool.connection() as connection:
-            data = get_search_data(connection.table("stream_data"),form['search-input'])
+        # with pool.connection() as connection:
+        #     data = get_search_data(connection.table("steam_data"), form['search-input'])
+        data = get_search_data(query, form['search-input'])
         return render_template(
             'search-games.html',
             username=username,
             data=data
         )
     else:
-        with pool.connection() as connection:
-            data = get_search_data(connection.table("stream_data"),None)
+        # with pool.connection() as connection:
+        #     data = get_search_data(None)
+        data = get_search_data(query, None)
         return render_template(
             'search-games.html',
             username=username,
@@ -158,15 +162,6 @@ def year_view():
         'year-analysis.html',
         username=username,
         years=get_analysis_data('years')
-    )
-
-
-@app.route('/reviews')
-def reviews_view():
-    username = session['username']
-    return render_template(
-        'game-reviews.html',
-        username=username
     )
 
 #

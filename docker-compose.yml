@@ -12,4 +12,4 @@ services:
       - HBASE_DOCKER_HOSTNAME=hbase-docker
 #      - HOSTNAME=hbase-docker
     volumes:
-      - D:\dev\others\mount_data\hbase-docker:/data
+      - /home/xa/mount_data/hbase-docker:/data

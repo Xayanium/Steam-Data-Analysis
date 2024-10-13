@@ -1,16 +1,14 @@
 # coding: utf-8
 # @Author: Xayanium
+
 import os.path
-
-# from Cython.Utility.MemoryView import result
 import json
-
-
-# from urllib.parse import to_bytes
+from pathlib import Path
+from utils.query import QueryData
 
 
 # 游戏表格详情页展示数据
-def get_table_data(hbase_table_conn):
+def get_table_data(query: QueryData):
     try:
         # result = query_mysql("""
         #     select id, title, icon, platform, release_date, review_summary, final_price,
@@ -18,12 +16,20 @@ def get_table_data(hbase_table_conn):
         #     from games
         # """, [], 'select')
 
-        result = hbase_table_conn.scan(columns=[b'games:id', b'games:title', b'games:icon', b'games:platform',
-                                                b'games:release_date', b'games:review_summary', b'games:final_price',
-                                                b'games:types',
-                                                b'games:description', b'games:video_link', b'games:developer',
-                                                b'games:publisher'])
-
+        # result = hbase_table_conn.scan(columns=[b'games:id', b'games:title', b'games:icon', b'games:platform',
+        #                                         b'games:release_date', b'games:review_summary', b'games:final_price',
+        #                                         b'games:types',
+        #                                         b'games:description', b'games:video_link', b'games:developer',
+        #                                         b'games:publisher'])
+        result = query.query_hbase(
+            table_name='steam_data',
+            args=[b'games:id', b'games:title', b'games:icon', b'games:platform',
+             b'games:release_date', b'games:review_summary', b'games:final_price',
+             b'games:types',
+             b'games:description', b'games:video_link', b'games:developer',
+             b'games:publisher'],
+            method='get_table_data'
+        )
     except Exception:
         return []
 
@@ -31,7 +37,7 @@ def get_table_data(hbase_table_conn):
     for row_key, x in result:
         game_dict.append(
             {
-                'id': int.from_bytes(x.get(b'games:id', b'\x00\x00\x00\x00\x00\x00\x00\x00')),
+                'id': int.from_bytes(x.get(b'games:id', b'\x00\x00\x00\x00\x00\x00\x00\x00'), byteorder='big'),
                 'name': x.get(b'games:title', b'').decode('utf-8'),
                 'icon': x.get(b'games:icon', b'').decode('utf-8'),
                 'platform': list(json.loads(x.get(b'games:platform', '[]'))),
@@ -44,29 +50,38 @@ def get_table_data(hbase_table_conn):
                 'firm': [x.get(b'games:developer', b'').decode('utf-8'), x.get(b'games:publisher', b'').decode('utf-8')]
             }
         )
-
     return game_dict
 
 
 # 游戏搜索详情页展示数据
-def get_search_data(hbase_table_conn, title):
+def get_search_data(query: QueryData, title):
     try:
         if title:
             # result = query_mysql("""
             #     select * from games where title like %s
             # """, ['%' + title + '%'], 'select')[0]
-            results = hbase_table_conn.scan(row_prefix=title.encode('utf-8'), limit=1)
+            # results = hbase_table_conn.scan(row_prefix=title.encode('utf-8'), limit=1)  # 返回一个生成器
+            results = query.query_hbase(
+                table_name='steam_data',
+                args=title.encode('utf-8'),
+                method='get_search_data'
+            )
         else:
             # result = query_mysql("""
             #             select * from games where id=1
             #         """, [], 'select')[0]
-            results = hbase_table_conn.scan(limit=1)
+            # results = hbase_table_conn.scan(limit=1)  # 返回一个生成器
+            results = query.query_hbase(
+                table_name='steam_data',
+                args=None,
+                method='get_search_data'
+            )
     except Exception:
         return {}
 
     for key, result in results:
         game_dict = {
-            'id': int.from_bytes(result.get(b'games:id', b'\x00\x00\x00\x00\x00\x00\x00\x00')),
+            'id': int.from_bytes(result.get(b'games:id', b'\x00\x00\x00\x00\x00\x00\x00\x00'), byteorder='big'),
             'name': result.get(b'games:title', b'').decode('utf-8'),
             'icon': result.get(b'games:icon', b'').decode('utf-8'),
             'platform': list(json.loads(result.get(b'games:platform', '[]'))),
@@ -90,16 +105,11 @@ def get_search_data(hbase_table_conn, title):
 
 # Mapreduce后的数据获取
 def get_analysis_data(key):
-    dir_path = os.path.abspath(os.path.dirname(__file__))
-    path = os.path.join(dir_path, 'SenrenBanka.json')
-    with open(path, 'r', encoding='utf-8') as file:
+    file_path = os.path.join(Path(__file__).parent.parent.resolve(), 'analyzer','SenrenBanka.json')
+    with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)[key]
         return data
 
 
 if __name__ == '__main__':
-    # result = get_analysis_data('prices')
-    # for k, v in result.items():
-    #     print(k, v)
-    print(get_analysis_data('types'))
     pass

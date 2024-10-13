@@ -1,1 +1,4 @@
+windows下:
  &"C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222 --user-data-dir="D:\Program\Selenium\Profile"
+linux下:
+google-chrome --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-debug

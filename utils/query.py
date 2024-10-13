@@ -2,56 +2,91 @@
 # @Author: Xayanium
 
 import os
-import pymysql
 import json
+import sys
 from pathlib import Path
-# import happybase
-# from pymysql import connect
-# from app import table_view
 
-HbaseTableConn = None
+import pymysql
+from dbutils.pooled_db import PooledDB
 
-def query_mysql(sql, args, method):
-    project_path = Path(__file__).parent.parent.resolve()
-    with open(os.path.join(project_path, 'config.json'), 'r', encoding='utf-8') as f:
-        config = json.load(f)['mysql']
-        conn = pymysql.connect(
-            host=config['host'],
-            port=config['port'],
-            database=config['database'],
-            user=config['user'],
-            password=config['password'],
-            charset=config['charset']
-        )
+current_platform = sys.platform  # 检测当前运行的平台
+if current_platform == 'linux':
+    import happybase
+
+
+class QueryData:
+    def __init__(self):
+        self.project_path = Path(__file__).parent.parent.resolve()
+        self.mysql_pool = self.mysql_connection()
+        self.hbase_pool = self.hbase_connection()
+
+    def mysql_connection(self):
+        with open(os.path.join(self.project_path, 'config.json'), 'r', encoding='utf-8') as f:
+            config = json.load(f)['mysql']
+            pool = PooledDB(
+                creator=pymysql,  # 使用 pymysql 连接数据库
+                maxconnections=10,  # 连接池允许的最大连接数，0 和 None 表示不限制连接数
+                mincached=2,  # 初始化时，连接池中至少创建的空闲的连接，0 表示不创建
+                maxcached=5,  # 连接池中最多闲置的连接，0 和 None 不限制
+                maxshared=3,  # 连接池中最多共享的连接数量，0 和 None 表示全部共享
+                blocking=True,  # 连接池中如果没有可用连接后，是否阻塞等待。True，等待；False，不等待然后报错
+                maxusage=None,  # 一个连接最多被重复使用的次数，None 表示无限制
+                ping=0,  # ping MySQL 服务端，检查是否服务可用, 0=Never
+                **config  # 数据库连接配置
+            )
+            return pool
+
+    def hbase_connection(self):
+        if current_platform == 'linux':
+            with open(os.path.join(self.project_path, 'config.json'), 'r', encoding='utf-8') as f:
+                config = json.load(f)['hbase']
+                pool = happybase.ConnectionPool(size=10, host=config['host'], port=int(config['port']), timeout=600)
+                return pool
+
+    def query_mysql(self, sql, args, method):
+        conn = self.mysql_pool.connection()  # 从连接池中获取连接
         try:
             with conn.cursor() as cursor:
-                cursor.execute(sql, args)#拼接
+                cursor.execute(sql, args)
                 if method == 'select':
-                    result = cursor.fetchall()#select
+                    result = cursor.fetchall()
                     return result
                 else:
-                    conn.commit()#执行
+                    conn.commit()
         except pymysql.MySQLError as e:
-            print('error: ', e)
+            print(e)
         finally:
-            conn.close()
+            conn.close()  # 将连接返回连接池
 
-# def hbase_connection():
-#     project_path = Path(__file__).parent.parent.resolve()
-#     with open(os.path.join(project_path, 'config.json'), 'r', encoding='utf-8') as f:
-#         config = json.load(f)['hbase']
-#
-#         pool=happybase.ConnectionPool(size=10,host=config['host'],port=int(config['port']))
-#         return pool
-        # try :
-        #     conn.create_table(name=config['table_name'],families={config['family']:dict()})
-        # except Exception as e:
-        #     print("table: already exists:",e)
-        # finally:
-        #     return conn.table(name=config['table_name'])
+    def query_hbase(self, table_name, args, method, row_key=None):
+        if current_platform == 'linux':
+            with self.hbase_pool.connection() as conn:
+                table = conn.table(table_name)
+                if method == 'get_search_data':
+                    return table.scan(row_prefix=args, limit=1)  # 返回生成器(仅获得一个查询数据)
+                elif method == 'get_table_data':
+                    return table.scan(columns=args)
+                elif method == 'insert':
+                    try:
+                        table.put(row_key.encode('utf-8'), args)
+                    except Exception as e:
+                        print(e)
+                # elif method == 'get_id':
+                #     return table.counter_inc(b'row_counter', b'games:counter')
+                elif method == 'create':
+                    try:
+                        conn.create_table(name=table_name, families={args: {}})
+                    except Exception as e:
+                        print("table: already exists:", e)
 
 
+def hbase_connection():
+    project_path = Path(__file__).parent.parent.resolve()
+    with open(os.path.join(project_path, 'config.json'), 'r', encoding='utf-8') as f:
+        config = json.load(f)['hbase']
+        pool = happybase.ConnectionPool(size=10, host=config['host'], port=int(config['port']))
+        return pool
 
 
 if __name__ == '__main__':
-    query_mysql('select * from user', [], 'select')
+    pass
