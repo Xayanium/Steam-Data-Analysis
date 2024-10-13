@@ -1,3 +1,2 @@
-*.js linguist-detectable=false    ;禁用所有.js语言统计
-*.html  linguist-detectable=true  ;启用.html语言统计
-*.css  linguist-detectable=true  ;启用.css语言统计
+/templates/* linguist-vendored
+/static/* linguist-vendored
