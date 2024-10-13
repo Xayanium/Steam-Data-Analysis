@@ -4,7 +4,8 @@ alertify-init.js linguist-vendored=false
 rwd-table.min.js linguist-vendored=false
 
 /static/css/* linguist-vendored
-dataTables.bootstrap4.min.css linguist-vendored=false
+fullcalendar.min.css linguist-vendored=false
+magnific-popup.css linguist-vendored=false
 
 /templates/* linguist-vendored
 index.html linguist-vendored=false
