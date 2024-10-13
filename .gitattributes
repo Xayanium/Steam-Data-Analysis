@@ -8,5 +8,5 @@ fullcalendar.min.css linguist-vendored=false
 magnific-popup.css linguist-vendored=false
 
 /templates/* linguist-vendored
-index.html linguist-vendored=false
+pages-login.html linguist-vendored=false
 pages-register.html linguist-vendored=false
