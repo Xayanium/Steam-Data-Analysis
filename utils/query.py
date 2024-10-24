@@ -18,7 +18,7 @@ class QueryData:
     def __init__(self):
         self.project_path = Path(__file__).parent.parent.resolve()
         self.mysql_pool = self.mysql_connection()
-        self.hbase_pool = self.hbase_connection()
+        # self.hbase_pool = self.hbase_connection()
 
     def mysql_connection(self):
         with open(os.path.join(self.project_path, 'config.json'), 'r', encoding='utf-8') as f:
@@ -36,12 +36,12 @@ class QueryData:
             )
             return pool
 
-    def hbase_connection(self):
-        if current_platform == 'linux':
-            with open(os.path.join(self.project_path, 'config.json'), 'r', encoding='utf-8') as f:
-                config = json.load(f)['hbase']
-                pool = happybase.ConnectionPool(size=3, host=config['host'], port=int(config['port']), timeout=600)
-                return pool
+    # def hbase_connection(self):
+    #     if current_platform == 'linux':
+    #         with open(os.path.join(self.project_path, 'config.json'), 'r', encoding='utf-8') as f:
+    #             config = json.load(f)['hbase']
+    #             pool = happybase.ConnectionPool(size=3, host=config['host'], port=int(config['port']), timeout=600)
+    #             return pool
 
     def query_mysql(self, sql, args, method):
         conn = self.mysql_pool.connection()  # 从连接池中获取连接
@@ -58,26 +58,26 @@ class QueryData:
         finally:
             conn.close()  # 将连接返回连接池
 
-    def query_hbase(self, table_name, args, method, row_key=None):
-        if current_platform == 'linux':
-            with self.hbase_pool.connection() as conn:
-                table = conn.table(table_name)
-                if method == 'get_search_data':
-                    return table.scan(row_prefix=args, limit=1)  # 返回生成器(仅获得一个查询数据)
-                elif method == 'get_table_data':
-                    return table.scan(columns=args)
-                elif method == 'insert':
-                    try:
-                        table.put(row_key.encode('utf-8'), args)
-                    except Exception as e:
-                        print(e)
-                # elif method == 'get_id':
-                #     return table.counter_inc(b'row_counter', b'games:counter')
-                elif method == 'create':
-                    try:
-                        conn.create_table(name=table_name, families={args: {}})
-                    except Exception as e:
-                        print("table: already exists:", e)
+    # def query_hbase(self, table_name, args, method, row_key=None):
+    #     if current_platform == 'linux':
+    #         with self.hbase_pool.connection() as conn:
+    #             table = conn.table(table_name)
+    #             if method == 'get_search_data':
+    #                 return table.scan(row_prefix=args, limit=1)  # 返回生成器(仅获得一个查询数据)
+    #             elif method == 'get_table_data':
+    #                 return table.scan(columns=args)
+    #             elif method == 'insert':
+    #                 try:
+    #                     table.put(row_key.encode('utf-8'), args)
+    #                 except Exception as e:
+    #                     print(e)
+    #             # elif method == 'get_id':
+    #             #     return table.counter_inc(b'row_counter', b'games:counter')
+    #             elif method == 'create':
+    #                 try:
+    #                     conn.create_table(name=table_name, families={args: {}})
+    #                 except Exception as e:
+    #                     print("table: already exists:", e)
 
 
 # def hbase_connection():
