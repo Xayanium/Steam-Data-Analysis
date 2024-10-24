@@ -16,16 +16,16 @@
 
 ### 3. 修改config.json中的配置信息为自己的mysql信息
 
-### 4. 在mysql中新建名为 `steam_data` 数据库
+### 4. 在mysql中新建名为 `steam_data` 数据库, 字符编码为 `utf8mb4`
 
-### 5. 修改docker-compose.yml文件，指定数据volume挂载到本地的目录，然后在项目根目录下执行 `docker-compose up -d`
+### 5. 修改docker-compose.yml文件，指定数据volume挂载到本地的目录，然后在项目根目录下执行 `sudo docker-compose up -d`
 
  **注**: 要先安装 `docker` 和 `docker-compose` , 并且由于 `dockerhub` 被禁止访问, 不能直接从 `dockerhub` 中直接拉取镜像
  需要先下载 `docker desktop`, 再通过魔法从docker desktop中下载 `dajobe/hbase:latest` 镜像, 然后在终端中执行命令 
  `docker save <image_name> -o <file_path>`, 生成一个 .tar 文件, (如果docker desktop在windows安装, 要将tar文件传入linux系统中), 
  然后再在 linux 中执行 `docker load -i <file_path>`
 
-### 6. 执行 `docker exec -it steam-data-analysis_hbase-docker_1 bash` 进入容器内部，执行 `echo $HOSTNAME` ，获取容器主机名, `ctrl+p ctrl+q` 退出容器命令行
+### 6. 执行 `sudo docker exec -it steam-data-analysis_hbase-docker_1 bash` 进入容器内部，执行 `echo $HOSTNAME` ，获取容器主机名, `ctrl+p ctrl+q` 退出容器命令行
 
 ### 7. 在宿主机中添加容器主机名和本地 IP 地址的映射, linux系统打开 `/etc/hosts` 文件, Windows系统打开 `"C:\Windows\System32\drivers\etc\hosts"` 文件，在文件末尾添加容器主机名和本地IP地址的映射，如：“127.0.0.1 xxxxx”（替换成你复制的主机名)
 

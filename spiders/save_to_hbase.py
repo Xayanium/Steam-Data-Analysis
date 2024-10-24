@@ -2,8 +2,11 @@
 # @Time    : 2024/10/12 10:41
 # @Author  : Xayanium
 
-
+import os
+import sys
 import math
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
 from utils.query import QueryData
 
 query = QueryData()
@@ -38,5 +41,5 @@ def save_to_hbase(start_id, end_id):
 
 if __name__ == '__main__':
     # 从mysql转存入HBASE, 更改起始id和结束id
-    save_to_hbase(119, 125)
+    save_to_hbase(1, 125)
 
