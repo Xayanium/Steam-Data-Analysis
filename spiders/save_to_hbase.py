@@ -41,5 +41,5 @@ def save_to_hbase(start_id, end_id):
 
 if __name__ == '__main__':
     # 从mysql转存入HBASE, 更改起始id和结束id
-    save_to_hbase(119, 125)
+    save_to_hbase(1, 125)
 
