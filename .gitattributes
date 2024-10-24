@@ -1,0 +1,12 @@
+/static/js/* linguist-vendored
+app.js linguist-vendored=false
+alertify-init.js linguist-vendored=false
+rwd-table.min.js linguist-vendored=false
+
+/static/css/* linguist-vendored
+fullcalendar.min.css linguist-vendored=false
+magnific-popup.css linguist-vendored=false
+
+/templates/* linguist-vendored
+pages-login.html linguist-vendored=false
+pages-register.html linguist-vendored=false

@@ -48,15 +48,13 @@
 
 ### 11. 进入 `spiders` 目录, 运行 `python3 spider_pages.py` (linux) / `python spider_pages.py` (windows)
 
-### 12. 在windows上运行爬虫程序还需要执行该步, 将mysql中数据复制到HBASE中, 回到linux系统, 在 `spiders` 目录下执行 `python3 save_to_hbase.py`
+### 12. 在windows上运行爬虫程序后还需要执行该步, 将mysql中数据复制到HBASE中, 回到linux系统, 在 `spiders` 目录下执行 `python3 save_to_hbase.py`
 
-### 13. 利用Navicat工具将数据库中的表以 `games.csv` 文件形式导出, 文件存放在 `utils` 目录下
+### 13. 进入 `analyzer` 目录, 执行 `python3 run_analyzer.py `, 自动从数据库中读取数据并生成csv文件, 利用Mapreduce计算出结果并自动保存至 `SenrenBanka.json` 文件
 
-### 14. 进入 `analyzer` 目录, 执行 `python3 run_analyzer.py `, 利用Mapreduce计算出结果保存至 `SenrenBanka.json` 文件
+### 14. 执行 `python3 app.py` (linux) / `python app.py` (windows), 将产生的url复制到浏览器可打开网页前端
 
-### 15. 执行 `python3 app.py` (linux) / `python app.py` (windows), 将产生的url复制到浏览器可打开网页前端
-
-### 16. 如果运行中出现报错, 请自行搜索解决方法
+### 15. 如果运行中出现报错, 请自行搜索解决方法
 
 
 

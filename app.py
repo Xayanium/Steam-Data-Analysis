@@ -89,7 +89,7 @@ def table_view():
     username = session['username']
     # with pool.connection() as connection:
     #     table_data= get_table_data(connection.table("steam_data"))
-    table_data = get_table_data(query.hbase_connection())
+    table_data = get_table_data(query)
 
     return render_template(
         'table-data.html',
@@ -105,7 +105,7 @@ def search_view():
         form = dict(request.form)
         # with pool.connection() as connection:
         #     data = get_search_data(connection.table("steam_data"), form['search-input'])
-        data = get_search_data(query.hbase_connection(), form['search-input'])
+        data = get_search_data(query, form['search-input'])
         return render_template(
             'search-games.html',
             username=username,
@@ -114,7 +114,7 @@ def search_view():
     else:
         # with pool.connection() as connection:
         #     data = get_search_data(None)
-        data = get_search_data(query.hbase_connection(), None)
+        data = get_search_data(query, None)
         return render_template(
             'search-games.html',
             username=username,
@@ -172,5 +172,5 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
 
