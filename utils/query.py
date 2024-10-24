@@ -40,7 +40,7 @@ class QueryData:
         if current_platform == 'linux':
             with open(os.path.join(self.project_path, 'config.json'), 'r', encoding='utf-8') as f:
                 config = json.load(f)['hbase']
-                pool = happybase.ConnectionPool(size=10, host=config['host'], port=int(config['port']), timeout=600)
+                pool = happybase.ConnectionPool(size=3, host=config['host'], port=int(config['port']), timeout=600)
                 return pool
 
     def query_mysql(self, sql, args, method):
@@ -80,12 +80,12 @@ class QueryData:
                         print("table: already exists:", e)
 
 
-def hbase_connection():
-    project_path = Path(__file__).parent.parent.resolve()
-    with open(os.path.join(project_path, 'config.json'), 'r', encoding='utf-8') as f:
-        config = json.load(f)['hbase']
-        pool = happybase.ConnectionPool(size=10, host=config['host'], port=int(config['port']))
-        return pool
+# def hbase_connection():
+#     project_path = Path(__file__).parent.parent.resolve()
+#     with open(os.path.join(project_path, 'config.json'), 'r', encoding='utf-8') as f:
+#         config = json.load(f)['hbase']
+#         pool = happybase.ConnectionPool(size=10, host=config['host'], port=int(config['port']))
+#         return pool
 
 
 if __name__ == '__main__':

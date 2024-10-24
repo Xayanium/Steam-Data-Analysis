@@ -19,7 +19,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
-from utils.query import QueryData, hbase_connection
+from utils.query import QueryData
 
 query = QueryData()
 
@@ -67,11 +67,8 @@ class Spider(object):
                         )
                         values(%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """, [row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]], 'insert')
-                    # hbase_id = HbaseTableConn.counter_inc(b'row_counter', b'games:counter')
-                    # hbase_id = query.query_hbase('steam_data', None, 'get_id', None)
                     if platform == 'linux':
                         data_map = {
-                            # b'games:id': hbase_id.to_bytes(length=math.ceil(hbase_id.bit_length()/8), byteorder='big'),
                             b'games:title': row[0],
                             b'games:icon': row[1],
                             b'games:platform': row[2],

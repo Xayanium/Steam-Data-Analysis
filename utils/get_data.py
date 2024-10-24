@@ -8,7 +8,7 @@ from utils.query import QueryData
 
 
 # 游戏表格详情页展示数据
-def get_table_data(query: QueryData):
+def get_table_data(hbase_conn):
     try:
         # result = query_mysql("""
         #     select id, title, icon, platform, release_date, review_summary, final_price,
@@ -21,15 +21,24 @@ def get_table_data(query: QueryData):
         #                                         b'games:types',
         #                                         b'games:description', b'games:video_link', b'games:developer',
         #                                         b'games:publisher'])
-        result = query.query_hbase(
-            table_name='steam_data',
-            args=[b'games:id', b'games:title', b'games:icon', b'games:platform',
-             b'games:release_date', b'games:review_summary', b'games:final_price',
-             b'games:types',
-             b'games:description', b'games:video_link', b'games:developer',
-             b'games:publisher'],
-            method='get_table_data'
-        )
+        with hbase_conn.connection() as conn:
+            table = conn.table('steam_data')
+            result = table.scan(
+                columns=[b'games:id', b'games:title', b'games:icon', b'games:platform',
+                         b'games:release_date', b'games:review_summary', b'games:final_price',
+                         b'games:types',
+                         b'games:description', b'games:video_link', b'games:developer',
+                         b'games:publisher']
+            )
+        # result = query.query_hbase(
+        #     table_name='steam_data',
+        #     args=[b'games:id', b'games:title', b'games:icon', b'games:platform',
+        #      b'games:release_date', b'games:review_summary', b'games:final_price',
+        #      b'games:types',
+        #      b'games:description', b'games:video_link', b'games:developer',
+        #      b'games:publisher'],
+        #     method='get_table_data'
+        # )
     except Exception:
         return []
 
@@ -54,28 +63,34 @@ def get_table_data(query: QueryData):
 
 
 # 游戏搜索详情页展示数据
-def get_search_data(query: QueryData, title):
+def get_search_data(hbase_conn, title):
     try:
         if title:
             # result = query_mysql("""
             #     select * from games where title like %s
             # """, ['%' + title + '%'], 'select')[0]
             # results = hbase_table_conn.scan(row_prefix=title.encode('utf-8'), limit=1)  # 返回一个生成器
-            results = query.query_hbase(
-                table_name='steam_data',
-                args=title.encode('utf-8'),
-                method='get_search_data'
-            )
+            # results = query.query_hbase(
+            #     table_name='steam_data',
+            #     args=title.encode('utf-8'),
+            #     method='get_search_data'
+            # )
+            with hbase_conn.connection() as conn:
+                table = conn.table('steam_data')
+                results = table.scan(row_prefix=title.encode('utf-8'), limit=1)
         else:
             # result = query_mysql("""
             #             select * from games where id=1
             #         """, [], 'select')[0]
             # results = hbase_table_conn.scan(limit=1)  # 返回一个生成器
-            results = query.query_hbase(
-                table_name='steam_data',
-                args=None,
-                method='get_search_data'
-            )
+            # results = query.query_hbase(
+            #     table_name='steam_data',
+            #     args=None,
+            #     method='get_search_data'
+            # )
+            with hbase_conn.connection() as conn:
+                table = conn.table('steam_data')
+                results = table.scan(limit=1)
     except Exception:
         return {}
 
