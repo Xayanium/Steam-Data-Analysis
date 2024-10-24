@@ -115,7 +115,7 @@ def search_view():
     else:
         # with pool.connection() as connection:
         #     data = get_search_data(None)
-        data = get_search_data(query.hbase_connection(), None)
+        data = get_search_data(query, None)
         return render_template(
             'search-games.html',
             username=username,
