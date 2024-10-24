@@ -2,8 +2,11 @@
 # @Time    : 2024/10/12 10:41
 # @Author  : Xayanium
 
-
+import os
+import sys
 import math
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
 from utils.query import QueryData
 
 query = QueryData()
