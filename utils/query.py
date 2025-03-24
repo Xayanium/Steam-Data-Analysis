@@ -9,9 +9,9 @@ from pathlib import Path
 import pymysql
 from dbutils.pooled_db import PooledDB
 
-current_platform = sys.platform  # 检测当前运行的平台
-if current_platform == 'linux':
-    import happybase
+# current_platform = sys.platform  # 检测当前运行的平台
+# if current_platform == 'linux':
+    # import happybase
 
 
 class QueryData:
