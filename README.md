@@ -20,10 +20,10 @@
 
 ### 5. 修改docker-compose.yml文件，指定数据volume挂载到本地的目录，然后在项目根目录下执行 `sudo docker-compose up -d`
 
- **注**: 要先安装 `docker` 和 `docker-compose` , 并且由于 `dockerhub` 被禁止访问, 不能直接从 `dockerhub` 中直接拉取镜像
- 需要先下载 `docker desktop`, 再通过魔法从docker desktop中下载 `dajobe/hbase:latest` 镜像, 然后在终端中执行命令 
- `docker save <image_name> -o <file_path>`, 生成一个 .tar 文件, (如果docker desktop在windows安装, 要将tar文件传入linux系统中), 
- 然后再在 linux 中执行 `docker load -i <file_path>`
+**注**: 要先安装 `docker` 和 `docker-compose` , 并且由于 `dockerhub` 被禁止访问, 不能直接从 `dockerhub` 中直接拉取镜像
+需要先下载 `docker desktop`, 再通过魔法从docker desktop中下载 `dajobe/hbase:latest` 镜像, 然后在终端中执行命令
+`docker save <image_name> -o <file_path>`, 生成一个 .tar 文件, (如果docker desktop在windows安装, 要将tar文件传入linux系统中),
+然后再在 linux 中执行 `docker load -i <file_path>`
 
 ### 6. 执行 `sudo docker exec -it steam-data-analysis_hbase-docker_1 bash` 进入容器内部，执行 `echo $HOSTNAME` ，获取容器主机名, `ctrl+p ctrl+q` 退出容器命令行
 
@@ -32,12 +32,15 @@
 ### 8. 运行 `init.py` 文件, 自动在数据库中初始化所需要的表
 
 #### 对于爬虫文件, 在linux上执行可能会遇到 steam访问不了/无图形化界面linux打不开chrome/运行不了爬虫文件, 在保留项目结构 (即目录Steam-Data_Analysis)的情况下将 `spiders` 文件夹
+
 #### 以及 `config.json` 复制到 windows 系统中, `config.json` 中的 `mysql` 的配置应为 linux 系统上的 `mysql` 服务配置
 
 如果爬虫一直失败, 可以使用位于 `test` 目录下的sql文件向 `mysql` 中导入数据, 并执行 `spiders` 目录中的 `save_to_hbase.py` 将mysql中数据导入 `hbase` 中
 
 ### 9. 在linux上安装chrome浏览器 (windows自行安装chrome并跳过该步)
-注: 此项需要保证使用的linux系统有图形化界面, 如果没有图形化界面可能导致出错, 
+
+注: 此项需要保证使用的linux系统有图形化界面, 如果没有图形化界面可能导致出错,
+
 1. `wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb`
 2. `sudo dpkg -i google-chrome-stable_current_amd64.deb`
 3. `google-chrome --version` 检查 chrome 版本
@@ -56,13 +59,9 @@
 
 ### 15. 如果运行中出现报错, 请自行搜索解决方法
 
-
-
 **项目结构:**
 
 `spider` : 爬虫, 用来对 `steam` 页面爬取信息
-
-
 
 `utils` : 一些复用的函数
 
@@ -70,9 +69,12 @@
 * `get_data.py` : 用于获取前端页面要展示的数据, flask 的 `app.py` 文件会使用该文件中的函数
 
 `analyser` :  利用mapreduce计算分析结果
+
 * `games.csv` : 从 `mysql` 导出的 csv 格式的游戏详细数据
 * `deal_data.py` : 使用 `mrjob` 操纵 `MapReduce` 进行计算, 生成 `SenrenBanka.json` 文件作为计算结果, 该文件需要单独运行, 使用 `python deal_data.py games.csv`
 * `run_analyzer.py` : 自动化运行脚本
 
 `templates/static` : 前端静态文件
 
+
+### 重构项目，使用hive替换mysql，使用spark替换pyMR
