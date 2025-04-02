@@ -15,25 +15,34 @@ def create_database(cursor):
     print("数据库创建成功或已存在")
 
 def create_games_table(cursor):
-    """创建games表"""
+    """清空数据并重建games表"""
     cursor.execute("USE steam_data")
+    cursor.execute("DROP TABLE IF EXISTS `games`")
     
-    # 创建游戏表
     create_table_sql = """
-    CREATE TABLE IF NOT EXISTS `games` (
-        game_id INT,
+    CREATE TABLE `games` (
+        id INT,
         title STRING,
+        icon STRING,
+        platform STRING,
+        release_date STRING,
+        review_summary STRING,
+        discount STRING,
+        original_price STRING,
+        final_price STRING,
+        detail_link STRING,
+        types STRING,
+        description STRING,
         developer STRING,
         publisher STRING,
-        release_date STRING,
-        price DOUBLE,
-        genres STRING,
-        rating INT,
-        description STRING
+        image_link STRING,
+        video_link STRING,
+        review STRING,
+        sys_requirements STRING
     )
     """
     cursor.execute(create_table_sql)
-    print("游戏表创建成功或已存在")
+    print("games表已清空并重建")
 
 def execute_sql_file(cursor, sql_file_path):
     """执行SQL文件"""
