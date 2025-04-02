@@ -9,7 +9,6 @@ from pathlib import Path
 import pymysql
 from dbutils.pooled_db import PooledDB
 from pyhive import hive
-import pandas as pd
 
 # current_platform = sys.platform  # 检测当前运行的平台
 # if current_platform == 'linux':
@@ -45,7 +44,7 @@ class QueryData:
 
     def query_hive(self, sql, args=None):
         """
-        执行Hive查询
+        执行Hive查询，不使用pandas
         """
         config = self.hive_config
         conn = hive.Connection(
@@ -54,6 +53,7 @@ class QueryData:
             database=config['database'],
             auth_mechanism=config.get('auth_mechanism', 'PLAIN')
         )
+        cursor = conn.cursor()
         try:
             # 将参数替换到SQL语句中
             if args:
@@ -65,15 +65,17 @@ class QueryData:
                     else:
                         sql = sql.replace('%s', str(arg), 1)
             
-            # 执行Hive查询并返回结果
-            df = pd.read_sql(sql, conn)
-            # 将DataFrame转换为元组列表
-            result = [tuple(x) for x in df.to_records(index=False)]
+            # 执行Hive查询
+            cursor.execute(sql)
+            
+            # 获取结果
+            result = cursor.fetchall()
             return result
         except Exception as e:
             print(f"Hive查询错误: {e}")
             return []
         finally:
+            cursor.close()
             conn.close()
 
     def query_mysql(self, sql, args, method):
