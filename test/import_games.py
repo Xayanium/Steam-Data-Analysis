@@ -11,8 +11,8 @@ def connect_to_hive():
     hive_conf = config["hive"]
     conn = hive.Connection(
         host=hive_conf["host"],
-        port=hive_conf["port"],
-        configuration={'hive.cli.encoding': 'utf8mb4'}
+        port=hive_conf["port"]
+        # 移除不支持的hive.cli.encoding配置
     )
     return conn
 
@@ -42,6 +42,9 @@ def create_games_table(cursor):
     cursor.execute("USE steam_data")
     cursor.execute("DROP TABLE IF EXISTS `games`")
     
+    # 移除可能不支持的配置项
+    cursor.execute("SET hive.exec.compress.output=false")
+    
     create_table_sql = """
     CREATE TABLE `games` (
         id INT,
@@ -62,7 +65,8 @@ def create_games_table(cursor):
         video_link STRING,
         review STRING,
         sys_requirements STRING
-    )
+    ) 
+    STORED AS TEXTFILE
     """
     cursor.execute(create_table_sql)
     print("games表已清空并重建")
@@ -74,24 +78,38 @@ def fetch_games_from_mysql(mysql_cursor):
 
 def export_games_to_hive(games, hive_cursor):
     """将MySQL导出的games数据写入Hive，处理UTF-8字符集"""
-    hive_cursor.execute("SET character_set_client=utf8mb4")
-    hive_cursor.execute("SET character_set_results=utf8mb4")
+    # 只保留必要的设置
+    hive_cursor.execute("SET hive.exec.compress.output=false")
     hive_cursor.execute("USE steam_data")
+    
     for row in games:
         values = []
         for value in row:
             if isinstance(value, str):
-                # 对字符串进行UTF-8编码转换，确保中文正确处理
-                value = value.encode('utf-8').decode('utf-8')
-                values.append("'" + value.replace("'", "''") + "'")
+                # 确保字符串正确编码并进行彻底的转义
+                # 先解码再编码确保字符串是有效的UTF-8
+                try:
+                    # 双重转义单引号，先替换为两个单引号，这是SQL标准的转义方式
+                    clean_value = value.replace("'", "''")
+                    values.append(f"'{clean_value}'")
+                except UnicodeError:
+                    # 如果遇到编码问题，尝试强制转换
+                    clean_value = value.encode('utf-8', errors='replace').decode('utf-8', errors='replace')
+                    clean_value = clean_value.replace("'", "''")
+                    values.append(f"'{clean_value}'")
             elif value is None:
                 values.append("NULL")
             else:
                 values.append(str(value))
+        
         insert_sql = f"INSERT INTO `games` VALUES ({', '.join(values)})"
-        print(f"执行SQL语句: {insert_sql}")
-        hive_cursor.execute(insert_sql)
-        print("执行SQL语句成功")
+        print(f"正在执行插入语句...")
+        try:
+            hive_cursor.execute(insert_sql)
+            print(f"数据插入成功")
+        except Exception as e:
+            print(f"插入失败: {e}")
+            print(f"问题SQL: {insert_sql[:200]}...")  # 只打印前200个字符避免日志过长
 
 def execute_sql_file(cursor, sql_file_path):
     """执行SQL文件"""
