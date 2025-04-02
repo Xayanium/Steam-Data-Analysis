@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pymysql
 from dbutils.pooled_db import PooledDB
+from pyhive import hive
+import pandas as pd
 
 # current_platform = sys.platform  # 检测当前运行的平台
 # if current_platform == 'linux':
@@ -18,6 +20,7 @@ class QueryData:
     def __init__(self):
         self.project_path = Path(__file__).parent.parent.resolve()
         self.mysql_pool = self.mysql_connection()
+        self.hive_config = self.get_hive_config()
         # self.hbase_pool = self.hbase_connection()
 
     def mysql_connection(self):
@@ -35,13 +38,43 @@ class QueryData:
                 **config  # 数据库连接配置
             )
             return pool
+            
+    def get_hive_config(self):
+        with open(os.path.join(self.project_path, 'config.json'), 'r', encoding='utf-8') as f:
+            return json.load(f)['hive']
 
-    # def hbase_connection(self):
-    #     if current_platform == 'linux':
-    #         with open(os.path.join(self.project_path, 'config.json'), 'r', encoding='utf-8') as f:
-    #             config = json.load(f)['hbase']
-    #             pool = happybase.ConnectionPool(size=3, host=config['host'], port=int(config['port']), timeout=600)
-    #             return pool
+    def query_hive(self, sql, args=None):
+        """
+        执行Hive查询
+        """
+        config = self.hive_config
+        conn = hive.Connection(
+            host=config['host'],
+            port=config['port'],
+            database=config['database'],
+            auth_mechanism=config.get('auth_mechanism', 'PLAIN')
+        )
+        try:
+            # 将参数替换到SQL语句中
+            if args:
+                for arg in args:
+                    if isinstance(arg, str):
+                        # 如果是字符串类型，需要添加引号
+                        arg_quoted = f"'{arg.replace('%', '')}'"
+                        sql = sql.replace('%s', arg_quoted, 1)
+                    else:
+                        sql = sql.replace('%s', str(arg), 1)
+            
+            # 执行Hive查询并返回结果
+            df = pd.read_sql(sql, conn)
+            # 将DataFrame转换为元组列表
+            result = [tuple(x) for x in df.to_records(index=False)]
+            return result
+        except Exception as e:
+            print(f"Hive查询错误: {e}")
+            return []
+        finally:
+            conn.close()
 
     def query_mysql(self, sql, args, method):
         conn = self.mysql_pool.connection()  # 从连接池中获取连接

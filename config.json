@@ -11,7 +11,8 @@
     "host": "localhost",
     "port": 10000,
     "database": "steam_data",
-    "charset": "utf8mb4"
+    "charset": "utf8mb4",
+    "auth_mechanism": "PLAIN"
   },
   "path": {
     "chromedriver": "/home/orician/.cache/selenium/chromedriver/linux64/129.0.6668.89/chromedriver",
