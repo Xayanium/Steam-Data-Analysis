@@ -1,11 +1,34 @@
 from pyhive import hive
 import os
+import json
+import pymysql
 
 def connect_to_hive():
     """连接到Hive服务器"""
+    config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json")
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config = json.load(f)
+    hive_conf = config["hive"]
     conn = hive.Connection(
-        host="localhost",
-        port=10000,
+        host=hive_conf["host"],
+        port=hive_conf["port"],
+        configuration={'hive.cli.encoding': 'utf8mb4'}
+    )
+    return conn
+
+def connect_to_mysql():
+    """连接到MySQL数据库"""
+    config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json")
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config = json.load(f)
+    mysql_conf = config["mysql"]
+    conn = pymysql.connect(
+        host=mysql_conf["host"],
+        port=mysql_conf["port"],
+        user=mysql_conf["user"],
+        password=mysql_conf["password"],
+        database=mysql_conf["database"],
+        charset=mysql_conf["charset"]
     )
     return conn
 
@@ -43,6 +66,32 @@ def create_games_table(cursor):
     """
     cursor.execute(create_table_sql)
     print("games表已清空并重建")
+
+def fetch_games_from_mysql(mysql_cursor):
+    """从MySQL中获取games表数据"""
+    mysql_cursor.execute("SELECT * FROM games")
+    return mysql_cursor.fetchall()
+
+def export_games_to_hive(games, hive_cursor):
+    """将MySQL导出的games数据写入Hive，处理UTF-8字符集"""
+    hive_cursor.execute("SET character_set_client=utf8mb4")
+    hive_cursor.execute("SET character_set_results=utf8mb4")
+    hive_cursor.execute("USE steam_data")
+    for row in games:
+        values = []
+        for value in row:
+            if isinstance(value, str):
+                # 对字符串进行UTF-8编码转换，确保中文正确处理
+                value = value.encode('utf-8').decode('utf-8')
+                values.append("'" + value.replace("'", "''") + "'")
+            elif value is None:
+                values.append("NULL")
+            else:
+                values.append(str(value))
+        insert_sql = f"INSERT INTO `games` VALUES ({', '.join(values)})"
+        print(f"执行SQL语句: {insert_sql}")
+        hive_cursor.execute(insert_sql)
+        print("执行SQL语句成功")
 
 def execute_sql_file(cursor, sql_file_path):
     """执行SQL文件"""
@@ -89,25 +138,29 @@ def main():
             print(f"错误: SQL文件不存在: {sql_file_path}")
             return
         
-        # 连接Hive
-        conn = connect_to_hive()
-        cursor = conn.cursor()
+        # 连接Hive并创建目标表
+        conn_hive = connect_to_hive()
+        hive_cursor = conn_hive.cursor()
+        create_database(hive_cursor)
+        create_games_table(hive_cursor)
         
-        # 创建数据库和表
-        create_database(cursor)
-        create_games_table(cursor)
+        # 从MySQL获取数据并导入到Hive
+        mysql_conn = connect_to_mysql()
+        mysql_cursor = mysql_conn.cursor()
+        games = fetch_games_from_mysql(mysql_cursor)
+        print(f"从MySQL获取 {len(games)} 条数据")
+        export_games_to_hive(games, hive_cursor)
         
-        # 执行SQL文件
-        execute_sql_file(cursor, sql_file_path)
-        
-        # 显示数据
-        show_table_data(cursor)
+        # 显示Hive中数据
+        show_table_data(hive_cursor)
         
         # 关闭连接
-        cursor.close()
-        conn.close()
+        mysql_cursor.close()
+        mysql_conn.close()
+        hive_cursor.close()
+        conn_hive.close()
         
-        print("游戏数据导入完成！")
+        print("数据从MySQL导入Hive完成！")
         
     except Exception as e:
         print(f"执行过程中出错: {e}")

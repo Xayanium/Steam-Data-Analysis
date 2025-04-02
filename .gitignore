@@ -8,4 +8,4 @@
 /__pycache__/
 /utils/__pycache__/
 spiders/__pycache__/save_to_hbase.cpython-312.pyc
-test/
+test/*.sql
