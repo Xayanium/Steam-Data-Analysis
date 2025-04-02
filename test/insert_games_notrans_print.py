@@ -74,8 +74,10 @@ def fetch_steam_from_mysql(cursor):
     cursor.execute("SELECT * FROM games")
     rows = cursor.fetchall()
     
-    # 验证字符集是否正确
-    print("MySQL字符集设置:", cursor.execute("SHOW VARIABLES LIKE 'character_set%'").fetchall())
+    # 验证字符集是否正确 - 修复这里的错误
+    cursor.execute("SHOW VARIABLES LIKE 'character_set%'")
+    charset_settings = cursor.fetchall()
+    print("MySQL字符集设置:", charset_settings)
     
     return rows
 
@@ -100,7 +102,7 @@ def export_steam_to_hive(games, hive_cursor):
                 values.append(str(value))
                 
         insert_sql = f"INSERT INTO games VALUES ({', '.join(values)})"
-        print("Executing SQL:", insert_sql[:100] + "...")  # 只打印前100个字符
+        print("Executing SQL:", insert_sql)  # 只打印前100个字符
         hive_cursor.execute(insert_sql)
         # 立即查询并打印这条记录，假设第一列为唯一标识id
         select_sql = f"SELECT * FROM games WHERE id = {row[0]}"
