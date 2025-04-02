@@ -108,7 +108,7 @@ def export_steam_to_hive(games, hive_cursor):
         select_sql = f"SELECT * FROM games WHERE id = {row[0]}"
         hive_cursor.execute(select_sql)
         inserted_record = hive_cursor.fetchone()
-        print("Inserted record:", inserted_record)
+        # print("Inserted record:", inserted_record)
 
 def main():
     # 从MySQL中获取steam表数据
