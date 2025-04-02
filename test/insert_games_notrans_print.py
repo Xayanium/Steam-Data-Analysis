@@ -2,6 +2,17 @@ import os
 import json
 import pymysql
 from pyhive import hive
+import sys
+import locale
+
+# 设置终端locale以支持UTF-8输出
+try:
+    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+except:
+    pass
+
+# 检查终端编码
+print(f"终端编码: {sys.stdout.encoding}")
 
 def connect_to_hive():
     config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json")
@@ -72,26 +83,34 @@ def fetch_steam_from_mysql(cursor):
     cursor.execute("SET character_set_connection=utf8mb4")
     cursor.execute("SET collation_connection=utf8mb4_unicode_ci")
     
-    # 查询数据前先检查编码
-    cursor.execute("SELECT 'こんにちは世界' AS test")
-    test_result = cursor.fetchone()
-    print(f"编码测试 (日文'你好世界'): {test_result[0]}")
-    
     # 查询数据
     cursor.execute("SELECT * FROM games")
     rows = cursor.fetchall()
     
-    # 验证字符集是否正确
-    cursor.execute("SHOW VARIABLES LIKE 'character_set%'")
-    charset_settings = cursor.fetchall()
-    print("MySQL字符集设置:", charset_settings)
+    # 处理数据以确保字符集正确
+    processed_rows = []
+    for row in rows:
+        processed_row = []
+        for value in row:
+            if isinstance(value, str):
+                # 尝试处理可能的编码问题
+                try:
+                    # 尝试Latin1->UTF8转换，解决一些常见的编码问题
+                    decoded_value = value.encode('latin1').decode('utf-8')
+                    processed_row.append(decoded_value)
+                except:
+                    # 如果失败则保留原始值
+                    processed_row.append(value)
+            else:
+                processed_row.append(value)
+        processed_rows.append(tuple(processed_row))
     
     # 检查第一行数据的部分字段
-    if rows and len(rows) > 0:
-        print(f"第一条记录标题: {rows[0][1]}")
-        print(f"第一条记录描述前50字符: {rows[0][11][:50] if rows[0][11] else 'None'}")
+    if processed_rows and len(processed_rows) > 0:
+        print(f"第一条记录标题: {processed_rows[0][1]}")
+        print(f"第一条记录描述前50字符: {processed_rows[0][11][:50] if processed_rows[0][11] else 'None'}")
     
-    return rows
+    return processed_rows
 
 def export_steam_to_hive(games, hive_cursor):
     hive_cursor.execute("USE steam_data")
@@ -99,22 +118,14 @@ def export_steam_to_hive(games, hive_cursor):
         values = []
         for value in row:
             if isinstance(value, str):
-                # 确保字符串是正确的UTF-8编码 - 增强处理方式
+                # 确保字符串符合Hive SQL要求
                 try:
-                    # 先检测是否是有效的UTF-8
-                    value.encode('utf-8')
+                    # 先确保是有效的UTF-8
                     clean_value = value.replace("'", "''")
                     values.append(f"'{clean_value}'")
                 except UnicodeError:
-                    # 如果不是有效的UTF-8，尝试不同的编码
-                    try:
-                        # 假设可能是latin1编码的数据
-                        clean_value = value.encode('latin1').decode('utf-8')
-                        clean_value = clean_value.replace("'", "''")
-                        values.append(f"'{clean_value}'")
-                    except:
-                        print(f"处理字符串时出错，无法识别编码: {value}")
-                        values.append("'编码错误'")
+                    # 如果有Unicode问题，使用适当的替代字符
+                    values.append("'无法显示的文本'")
             elif value is None:
                 values.append("NULL")
             else:
@@ -123,11 +134,12 @@ def export_steam_to_hive(games, hive_cursor):
         insert_sql = f"INSERT INTO games VALUES ({', '.join(values)})"
         print("Executing SQL:", insert_sql[:100] + "...")  # 只打印前100个字符
         hive_cursor.execute(insert_sql)
-        # 立即查询并打印这条记录，假设第一列为唯一标识id
-        select_sql = f"SELECT * FROM games WHERE id = {row[0]}"
+        
+        # 立即查询并打印这条记录
+        select_sql = f"SELECT id, title FROM games WHERE id = {row[0]}"
         hive_cursor.execute(select_sql)
         inserted_record = hive_cursor.fetchone()
-        # print("Inserted record:", inserted_record)
+        print(f"已插入记录ID: {row[0]}, 标题: {inserted_record[1] if inserted_record else 'Unknown'}")
 
 def main():
     # 从MySQL中获取steam表数据
