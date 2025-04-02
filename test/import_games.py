@@ -2,6 +2,7 @@ from pyhive import hive
 import os
 import json
 import pymysql
+from googletrans import Translator  # 引入翻译库
 
 def connect_to_hive():
     """连接到Hive服务器"""
@@ -71,10 +72,51 @@ def create_games_table(cursor):
     cursor.execute(create_table_sql)
     print("games表已清空并重建")
 
+def create_steam_table(cursor):
+    """清空数据并重建steam表"""
+    cursor.execute("USE steam_data")
+    cursor.execute("DROP TABLE IF EXISTS `steam`")
+    
+    create_table_sql = """
+    CREATE TABLE `steam` (
+        id INT,
+        title STRING,
+        icon STRING,
+        platform STRING,
+        release_date STRING,
+        review_summary STRING,
+        discount STRING,
+        original_price STRING,
+        final_price STRING,
+        detail_link STRING,
+        types STRING,
+        description STRING,
+        developer STRING,
+        publisher STRING,
+        image_link STRING,
+        video_link STRING,
+        review STRING,
+        sys_requirements STRING
+    ) 
+    STORED AS TEXTFILE
+    """
+    cursor.execute(create_table_sql)
+    print("steam表已清空并重建")
+
 def fetch_games_from_mysql(mysql_cursor):
     """从MySQL中获取games表数据"""
     mysql_cursor.execute("SELECT * FROM games")
     return mysql_cursor.fetchall()
+
+def translate_to_chinese(text):
+    """将文本翻译为中文"""
+    translator = Translator()
+    try:
+        translated = translator.translate(text, src='en', dest='zh-cn')
+        return translated.text
+    except Exception as e:
+        print(f"翻译失败: {e}")
+        return text  # 如果翻译失败，返回原始文本
 
 def export_games_to_hive(games, hive_cursor):
     """将MySQL导出的games数据写入Hive，处理UTF-8字符集"""
@@ -110,6 +152,28 @@ def export_games_to_hive(games, hive_cursor):
         except Exception as e:
             print(f"插入失败: {e}")
             print(f"问题SQL: {insert_sql[:200]}...")  # 只打印前200个字符避免日志过长
+
+def export_steam_to_hive(games, hive_cursor):
+    """将MySQL导出的steam数据写入Hive，翻译string字段为中文"""
+    hive_cursor.execute("USE steam_data")
+    for row in games:
+        values = []
+        for idx, value in enumerate(row):
+            if isinstance(value, str):
+                # 翻译string字段为中文
+                if idx not in [2, 9, 14, 15]:  # 跳过不需要翻译的字段（如URL）
+                    value = translate_to_chinese(value)
+                value = value.replace("'", "''")  # 转义单引号
+                values.append(f"'{value}'")
+            elif value is None:
+                values.append("NULL")
+            else:
+                values.append(str(value))
+        
+        insert_sql = f"INSERT INTO `steam` VALUES ({', '.join(values)})"
+        print(f"正在执行插入语句...")
+        hive_cursor.execute(insert_sql)
+        print(f"数据插入成功")
 
 def execute_sql_file(cursor, sql_file_path):
     """执行SQL文件"""
@@ -160,14 +224,14 @@ def main():
         conn_hive = connect_to_hive()
         hive_cursor = conn_hive.cursor()
         create_database(hive_cursor)
-        create_games_table(hive_cursor)
+        create_steam_table(hive_cursor)
         
         # 从MySQL获取数据并导入到Hive
         mysql_conn = connect_to_mysql()
         mysql_cursor = mysql_conn.cursor()
         games = fetch_games_from_mysql(mysql_cursor)
         print(f"从MySQL获取 {len(games)} 条数据")
-        export_games_to_hive(games, hive_cursor)
+        export_steam_to_hive(games, hive_cursor)
         
         # 显示Hive中数据
         show_table_data(hive_cursor)
