@@ -30,7 +30,7 @@ def create_csv():
 
 
 def exec_mapreduce():
-    result = subprocess.run('python3 deal_data.py games.csv', shell=True, capture_output=True)
+    result = subprocess.run('python3 /app/analyzer/deal_data.py games.csv', shell=True, capture_output=True)
     print('output: ', result.stdout.decode('utf-8'))
     print('error: ', result.stderr.decode('utf-8'))
 
