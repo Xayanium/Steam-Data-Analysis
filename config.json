@@ -1,6 +1,6 @@
 {
   "mysql": {
-    "host": "127.0.0.1",
+    "host": "mysql",
     "port": 3306,
     "database": "steam_data",
     "user": "root",
@@ -8,7 +8,7 @@
     "charset": "utf8mb4"
   },
   "hive": {
-    "host": "localhost",
+    "host": "hive4",
     "port": 10000,
     "database": "steam_data",
     "charset": "utf8mb4"

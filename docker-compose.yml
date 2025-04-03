@@ -13,6 +13,8 @@ services:
     volumes:
       # - ./mount/data:/opt/bitnami/spark/data
       - /home/orician/workspace/big_data/Steam-Data-Analysis:/app
+    networks:
+      - bigdata_net
   
   hive4:
     image: apache/hive:4.0.0
@@ -22,6 +24,9 @@ services:
       - "10002:10002"
     environment:
       - SERVICE_NAME=hiveserver2
+      - USER=hive
+    networks:
+      - bigdata_net
       
   mysql:
     image: mysql:8.0
@@ -36,6 +41,12 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql-conf:/etc/mysql/conf.d
+    networks:
+      - bigdata_net
 
 volumes:
   mysql_data:
+
+networks:
+  bigdata_net:
+    driver: bridge

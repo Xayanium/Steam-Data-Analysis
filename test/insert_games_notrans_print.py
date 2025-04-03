@@ -22,7 +22,8 @@ def connect_to_hive():
     conn = hive.Connection(
         host=hive_conf["host"],
         port=hive_conf["port"],
-        database=hive_conf["database"]
+        database=hive_conf["database"],
+        username=hive_conf.get("username", "hive")
     )
     return conn
 
