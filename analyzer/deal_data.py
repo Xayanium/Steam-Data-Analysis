@@ -58,8 +58,11 @@ class YearCount:
     @staticmethod
     def parse_output(output_lines):
         for line in output_lines:
-            key, value = line.strip().split("\t")
-            yield (int(key) if key.isdigit() else key, int(value))
+            if isinstance(line, tuple):
+                key, value = line
+            else:
+                key, value = line.strip().split("\t")
+            yield (int(key) if isinstance(key, str) and key.isdigit() else key, int(value))
 
 
 # 重构后的 ReviewCount
@@ -85,7 +88,10 @@ class ReviewCount:
     @staticmethod
     def parse_output(output_lines):
         for line in output_lines:
-            key, value = line.strip().split("\t")
+            if isinstance(line, tuple):
+                key, value = line
+            else:
+                key, value = line.strip().split("\t")
             yield (key, int(value))
 
 
@@ -110,7 +116,10 @@ class PriceCount:
     @staticmethod
     def parse_output(output_lines):
         for line in output_lines:
-            key, value = line.strip().split("\t")
+            if isinstance(line, tuple):
+                key, value = line
+            else:
+                key, value = line.strip().split("\t")
             yield (key, int(value))
 
 
@@ -134,7 +143,10 @@ class PlatformCount:
     @staticmethod
     def parse_output(output_lines):
         for line in output_lines:
-            key, value = line.strip().split("\t")
+            if isinstance(line, tuple):
+                key, value = line
+            else:
+                key, value = line.strip().split("\t")
             yield (key, int(value))
 
 
@@ -158,7 +170,10 @@ class TypeCount:
     @staticmethod
     def parse_output(output_lines):
         for line in output_lines:
-            key, value = line.strip().split("\t")
+            if isinstance(line, tuple):
+                key, value = line
+            else:
+                key, value = line.strip().split("\t")
             yield (key, int(value))
 
 
@@ -189,9 +204,11 @@ class MaxDiscount:
     
     @staticmethod
     def parse_output(output_lines):
-        # 这里原实现分为两阶段，解析时直接拆分最后一个字段
         for line in output_lines:
-            _, out = line.strip().split("\t", 1)
+            if isinstance(line, tuple):
+                _, out = line
+            else:
+                _, out = line.strip().split("\t", 1)
             name, discount = out.split("\t")
             yield (name, int(discount))
 
@@ -223,7 +240,10 @@ class MaxPrice:
     @staticmethod
     def parse_output(output_lines):
         for line in output_lines:
-            _, out = line.strip().split("\t", 1)
+            if isinstance(line, tuple):
+                _, out = line
+            else:
+                _, out = line.strip().split("\t", 1)
             name, price = out.split("\t")
             yield (name, float(price))
 
@@ -297,7 +317,7 @@ if __name__ == '__main__':
     except FileNotFoundError:
         pass
 
-    with open('SenrenBanka.json', 'w', encoding='utf-8') as f:
+    with open('/app/analyzer/SenrenBanka.json', 'w', encoding='utf-8') as f:
         f.write(json.dumps(result_json, ensure_ascii=False, indent=4))
 
     print(time.time()-st)
