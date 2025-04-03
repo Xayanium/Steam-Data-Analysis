@@ -1,15 +1,59 @@
 services:
-  hbase-docker:
-    image: dajobe/hbase:latest
+  spark3.5.2:
+    image: bitnami/spark:latest
+    container_name: spark3.5.2
     ports:
-      - "2181:2181"
       - "8080:8080"
-      - "8085:8085"
-      - "9090:9090"
-      - "9095:9095"
-      - "16020:16010"
+      - "7077:7077"
+      - "11451:11451"
+      - "5000:5000"
     environment:
-      - HBASE_DOCKER_HOSTNAME=hbase-docker
-#      - HOSTNAME=hbase-docker
+      - SPARK_SSL_NEED_CLIENT_AUTH=no
+      - PYSPARK_PYTHON=/opt/bitnami/python/bin/python3
     volumes:
-      - /home/xa/mount_data/hbase-docker:/data
+      # - ./mount/data:/opt/bitnami/spark/data
+      - /home/orician/workspace/big_data/Steam-Data-Analysis:/app
+    networks:
+      - bigdata_net
+#使用挂载的目录作为工作目录
+#pip freeze > requirements.txt
+#docker exec -it spark3.5.2 pip install --upgrade pip
+#docker exec -it spark3.5.2 pip install -r /app/requirements.txt
+#docker exec -it spark3.5.2 python3 /app/app.py
+  hive4:
+    image: apache/hive:4.0.0
+    container_name: hive4
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+    volumes:
+      - ./hive/hive_data:/opt/hive/data/warehouse
+      - ./hive/metastore_db:/opt/hive/metastore_db
+    environment:
+      - SERVICE_NAME=hiveserver2
+      - USER=hive
+    networks:
+      - bigdata_net
+# docker exec -it hive4 beeline -u 'jdbc:hive2://localhost:10000/'
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=steam_data
+      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
+      - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-conf:/etc/mysql/conf.d
+    networks:
+      - bigdata_net
+
+volumes:
+  mysql_data:
+
+networks:
+  bigdata_net:
+    driver: bridge

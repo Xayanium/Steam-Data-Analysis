@@ -44,7 +44,7 @@ if __name__ == '__main__':
     """, [], 'create')
 
     # 创建hbase中表和列族
-    query.query_hbase('steam_data', 'games', 'create')
+    # query.query_hbase('steam_data', 'games', 'create')
     print('successfully init databases')
 
 

@@ -162,7 +162,7 @@ class Spider(object):
 
             try:
                 final_price = re.search(
-                    "[\d.,]+",
+                    r"[\d.,]+",
                     game.find_element(by=By.XPATH, value=".//div[contains(@class, 'discount_final_price')]").text
                 ).group()
             except Exception:
@@ -170,10 +170,10 @@ class Spider(object):
 
             try:
                 discount = 100 - int(re.search(
-                    "\d+", game.find_element(by=By.XPATH, value=".//div[@class='discount_pct']").text
+                    r"\d+", game.find_element(by=By.XPATH, value=".//div[@class='discount_pct']").text
                 ).group())
                 original_price = float(re.search(
-                    "[\d.,]+",
+                    r"[\d.,]+",
                     game.find_element(
                         by=By.XPATH,
                         value=".//div[contains(@class, 'discount_original_price')]"
