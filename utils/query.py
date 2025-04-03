@@ -59,8 +59,8 @@ class QueryData:
             if args:
                 for arg in args:
                     if isinstance(arg, str):
-                        # 如果是字符串类型，需要添加引号
-                        arg_quoted = f"'{arg.replace('%', '')}'"
+                        # 保留通配符，不移除 '%' 符号
+                        arg_quoted = f"'{arg}'"
                         sql = sql.replace('%s', arg_quoted, 1)
                     else:
                         sql = sql.replace('%s', str(arg), 1)
