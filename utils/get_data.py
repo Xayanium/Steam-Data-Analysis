@@ -28,11 +28,11 @@ def get_table_data(query_conn: QueryData):
                 'id': result[0],
                 'name': result[1],
                 'icon': result[2],
-                'platform': list(json.loads(result[3])),
+                'platform': list(json.loads(result[3])) if result[3] is not None else [],
                 'release_date': result[4],
-                'review': result[5].split('\u3002')[0],  # 截取中文句号前内容
+                'review': result[5].split('\u3002')[0] if result[5] is not None else '',  # 截取中文句号前内容
                 'price': result[6],
-                'types': list(json.loads(result[7])),
+                'types': list(json.loads(result[7])) if result[7] is not None else [],
                 'description': result[8],
                 'video': result[9],
                 'firm': [result[10], result[11]]
@@ -61,21 +61,21 @@ def get_search_data(query_conn: QueryData, title):
         'id': results[0],
         'name': results[1],
         'icon': results[2],
-        'platform': json.loads(results[3]),
+        'platform': json.loads(results[3]) if results[3] is not None else [],
         'release_date': results[4],
-        'review_summary': results[5].split('\u3002')[0],  # 截取中文句号前内容
+        'review_summary': results[5].split('\u3002')[0] if results[5] is not None else '',  # 截取中文句号前内容
         'discount': results[6],
         'original_price': results[7],
         'final_price': results[8],
         'detail_link': results[9],
-        'types': json.loads(results[10]),
+        'types': json.loads(results[10]) if results[10] is not None else [],
         'description': results[11],
         'developer': results[12],
         'publisher': results[13],
         'image_link': results[14],
         'video_link': results[15],
-        'review': json.loads(results[16]),
-        'sys_requirements': json.loads(results[17])
+        'review': json.loads(results[16]) if results[16] is not None else {},
+        'sys_requirements': json.loads(results[17]) if results[17] is not None else {}
     }
     return game_dict
 
