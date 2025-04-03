@@ -22,8 +22,8 @@ def connect_to_hive():
     conn = hive.Connection(
         host=hive_conf["host"],
         port=hive_conf["port"],
-        database=hive_conf["database"],
         username=hive_conf.get("username", "hive")
+        # 移除 database 参数，避免在创建数据库前尝试使用它
     )
     return conn
 
@@ -46,8 +46,9 @@ def connect_to_mysql():
 
 def create_hive_steam_table(cursor):
     # 设置会话级别的编码相关参数，仅设置支持的参数
-    # cursor.execute("SET hive.default.fileformat.encoding=UTF-8")  # 此配置不被支持
     cursor.execute("SET mapreduce.output.fileoutputformat.output.encoding=UTF-8")
+    # 确保steam_data数据库存在
+    cursor.execute("CREATE DATABASE IF NOT EXISTS steam_data")
     cursor.execute("USE steam_data")
     cursor.execute("DROP TABLE IF EXISTS games")
     create_table_sql = """

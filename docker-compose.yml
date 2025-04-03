@@ -15,7 +15,11 @@ services:
       - /home/orician/workspace/big_data/Steam-Data-Analysis:/app
     networks:
       - bigdata_net
-  
+#使用挂载的目录作为工作目录
+#pip freeze > requirements.txt
+#docker exec -it spark3.5.2 pip install --upgrade pip
+#docker exec -it spark3.5.2 pip install -r /app/requirements.txt
+#docker exec -it spark3.5.2 python3 /app/main.py
   hive4:
     image: apache/hive:4.0.0
     container_name: hive4
