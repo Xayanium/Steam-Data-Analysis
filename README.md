@@ -76,5 +76,8 @@
 
 `templates/static` : 前端静态文件
 
+## 项目重构后的逻辑
 
-### 重构项目，使用hive替换mysql，使用spark替换pyMR
+本项目经过重构后进行了以下改动：
+- 使用 Hive 替换 MySQL：数据查询和分析不再直接依赖 MySQL，而是通过 Hive 进行大数据量的灵活查询，充分利用 Hive SQL 的特性。
+- 使用 Spark 替换 pyMRjobs：原先基于 pyMRjobs 的 MapReduce 任务改为使用 Spark 实现分布式计算，获得更高的计算性能和更好的扩展性。
