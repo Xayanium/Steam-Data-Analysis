@@ -81,3 +81,52 @@
 本项目经过重构后进行了以下改动：
 - 使用 Hive 替换 MySQL：数据查询和分析不再直接依赖 MySQL，而是通过 Hive 进行大数据量的灵活查询，充分利用 Hive SQL 的特性。
 - 使用 Spark 替换 pyMRjobs：原先基于 pyMRjobs 的 MapReduce 任务改为使用 Spark 实现分布式计算，获得更高的计算性能和更好的扩展性。
+
+## Hive 操作逻辑
+
+本项目通过 Hive 实现大数据量的查询与分析，其优势在于：
+- 提供分布式存储，适合处理海量数据。
+- 支持 Hive SQL，使查询更加灵活高效。
+- 可与 Spark 联合使用，实现数据的高性能处理。
+
+具体步骤：
+1. 在 config.json 中配置 Hive 服务信息（如 host、port、database 等）。
+2. 利用 Docker Compose 启动 Hive 容器（服务名为 hive4），并使用 Beeline 或 pyhive 连接 Hive。
+3. 在 utils/query.py 中，通过 query_hive 方法连接 Hive，执行建表、数据导入与查询操作。
+4. 爬虫从 MySQL 导出数据后，Hive 用于备份及数据二次查询，确保数据可靠性和处理速度。
+
+## Spark 操作逻辑
+
+本项目采用 Spark 替换了原先的 pyMRjobs 作为 MapReduce 框架，其优势在于：
+- 分布式计算性能更高、扩展性更好。
+- 基于 RDD/DataFrame 进行数据转换，语法更简洁清晰。
+- 通过与 Hive 联合，实现数据的高效存储和查询。
+
+具体步骤：
+1. 利用 Docker Compose 启动 Spark 容器（服务名为 spark3.5.2）。
+2. 在 analyzer/deal_data.py 中，创建 SparkSession 读取 CSV 数据，并将数据转化为 RDD：
+   - 使用 map、flatMap、reduceByKey 等算子实现各类统计任务（如年份统计、平台统计、价格区间统计等）。
+   - 通过 SparkRunner 封装任务运行，实现任务调度和异常处理。
+3. 计算结果保存至 JSON 文件（SenrenBanka.json），供前端展示数据分析结果使用。
+
+### Spark 本地模式说明
+
+在未指定 master 地址时，Spark 默认采用本地模式运行：
+- Spark 会自动使用类似 "local[*]" 的配置，在本地启动一个 Spark 会话。
+- 本地模式下，所有任务都在单机上完成，不需要通过网络连接远程集群，因此无需指定地址和端口。
+- 这种方式非常适合开发、测试和调试环境。
+
+因此，在代码中调用 `SparkSession.builder.appName(self.appName).getOrCreate()` 即可自动创建本地 Spark 环境，无需手动指定地址和端口。
+
+### Spark 分析任务
+
+重构后的 [analyzer/deal_data.py](analyzer/deal_data.py) 文件中实现了以下数据分析任务：
+- **YearCount**：统计游戏发布时间年份及数量。
+- **ReviewCount**：统计不同评论级别游戏的分布。
+- **PriceCount**：统计游戏价格区间内的数量分布（区间长度为 25）。
+- **PlatformCount**：统计各游戏平台中游戏的数量。
+- **TypeCount**：统计游戏标签及其出现次数，同时筛选出数量最多的标签。
+- **MaxPrice**：筛选出价格最高的游戏信息。
+- **MaxDiscount**：筛选出折扣最大的游戏信息。
+
+以上任务均通过 SparkRunner 类进行封装与执行，实现了分布式计算与结果聚合。

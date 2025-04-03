@@ -52,7 +52,6 @@ class QueryData:
             port=config['port'],
             database=config['database'],
             username=config.get("username", "hive")
-            # auth_mechanism=config.get('auth_mechanism', 'PLAIN')
         )
         cursor = conn.cursor()
         try:
