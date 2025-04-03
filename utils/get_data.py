@@ -41,29 +41,61 @@ def get_table_data(query_conn: QueryData):
     return game_dict
 
 
+# 新增安全加载 JSON 的辅助函数
+def safe_json_load(s):
+    try:
+        return json.loads(s)
+    except Exception:
+        return {}
+
 # 游戏搜索详情页展示数据
 def get_search_data(query_conn: QueryData, title):
     try:
-        if title:
-            results = query_conn.query_hive("""
-                select * from games where title like %s
-            """, ['%' + title + '%'])[0]  # Hive查询后取第一条结果
+        search_str = title.strip() if title else ''
+        if search_str:
+            # 修改查询为不区分大小写，并打印调试信息
+            results_all = query_conn.query_hive("""
+                select * from games where lower(title) like lower(%s)
+            """, ['%' + search_str + '%'])
         else:
-            results = query_conn.query_hive("""
+            results_all = query_conn.query_hive("""
                 select * from games where id=1
-            """)[0]  # Hive查询后取第一条结果
-
+            """)
+        print(f"搜索标题: '{search_str}', 返回结果数: {len(results_all)}")
+        # 返回结果为空时，直接返回一个默认结构
+        if not results_all:
+            return {
+                'id': None,
+                'name': '',
+                'icon': '',
+                'platform': [],
+                'release_date': '',
+                'review_summary': '',
+                'discount': '',
+                'original_price': '',
+                'final_price': '',
+                'detail_link': '',
+                'types': [],
+                'description': '',
+                'developer': '',
+                'publisher': '',
+                'image_link': '',
+                'video_link': '',
+                'review': [],
+                'sys_requirements': []
+            }
+        results = results_all[0]
     except Exception as e:
         print(f"搜索数据错误: {e}")
         return {}
-
+        
     game_dict = {
         'id': results[0],
         'name': results[1],
         'icon': results[2],
         'platform': json.loads(results[3]) if results[3] is not None else [],
         'release_date': results[4],
-        'review_summary': results[5].split('\u3002')[0] if results[5] is not None else '',  # 截取中文句号前内容
+        'review_summary': results[5].split('\u3002')[0] if results[5] is not None else '',
         'discount': results[6],
         'original_price': results[7],
         'final_price': results[8],
@@ -74,8 +106,8 @@ def get_search_data(query_conn: QueryData, title):
         'publisher': results[13],
         'image_link': results[14],
         'video_link': results[15],
-        'review': json.loads(results[16]) if results[16] is not None else {},
-        'sys_requirements': json.loads(results[17]) if results[17] is not None else {}
+        'review': safe_json_load(results[16]) if results[16] is not None else [],
+        'sys_requirements': safe_json_load(results[17]) if results[17] is not None else []
     }
     return game_dict
 
