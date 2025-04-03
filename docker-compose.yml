@@ -31,7 +31,7 @@ services:
       - USER=hive
     networks:
       - bigdata_net
-      
+# docker exec -it hive4 beeline -u 'jdbc:hive2://localhost:10000/'
   mysql:
     image: mysql:8.0
     container_name: mysql

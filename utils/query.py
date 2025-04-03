@@ -50,7 +50,8 @@ class QueryData:
         conn = hive.Connection(
             host=config['host'],
             port=config['port'],
-            database=config['database']
+            database=config['database'],
+            username=config.get("username", "hive")
             # auth_mechanism=config.get('auth_mechanism', 'PLAIN')
         )
         cursor = conn.cursor()
