@@ -1,3 +1,6 @@
+### 效果预览：https://github.com/Xayanium/Steam-Data-Analysis/blob/master/Steam%E6%B8%B8%E6%88%8F%E5%88%86%E6%9E%90%E5%8F%AF%E8%A7%86%E5%8C%96.pdf
+
+
 **运行步骤:**
 
 ### 1. 项目 git clone 到本地 / 下载压缩文件解压
