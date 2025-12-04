@@ -4,7 +4,7 @@
     "port": 3306,
     "database": "steam_data",
     "user": "root",
-    "password": "root",
+    "password": "1111",
     "charset": "utf8mb4"
   }
 
