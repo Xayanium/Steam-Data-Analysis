@@ -1,3 +1,5 @@
+### feature/mysql-version：最初始的版本，只使用MySQL存储数据，使用Mapreduce处理数据
+
 ### 效果预览：https://github.com/Xayanium/Steam-Data-Analysis/blob/master/Steam%E6%B8%B8%E6%88%8F%E5%88%86%E6%9E%90%E5%8F%AF%E8%A7%86%E5%8C%96.pdf
 
 
